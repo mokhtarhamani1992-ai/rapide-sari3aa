@@ -8,6 +8,9 @@
   "background_color": "#f9fafb",
   "theme_color": "#059669",
   "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["transportation", "productivity", "utilities"],
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2921/2921222.png",
@@ -22,6 +25,14 @@
       "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "واجهة طلب النقل والمعدات في تطبيق سريعة"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "طلب نقل",
+      "short_name": "نقل",
+      "url": "./index.html?action=transport",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/2921/2921222.png", "sizes": "512x512", "type": "image/png" }]
     }
   ]
 }
