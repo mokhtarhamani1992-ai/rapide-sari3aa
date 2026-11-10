@@ -1,6 +1,7 @@
 {
   "name": "سريعة RAPIDE - توصيل ونقل البضائع والمعدات",
   "short_name": "سريعة RAPIDE",
+  "description": "منصة سريعة (RAPIDE) لنقل وتوصيل البضائع، المعدات الثقيلة، وطلب عمال الشحن والتفريغ في الجزائر مع تتبع حي وميزة تحديد المواقع.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f9fafb",
