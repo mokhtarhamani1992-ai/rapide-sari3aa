@@ -13,7 +13,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="سريعة RAPIDE">
 
-<!-- ربط ملف الـ Manifest -->
 <link rel="manifest" href="manifest.json">
 
 <style>
@@ -44,7 +43,7 @@ body { font-family: 'Cairo', sans-serif; }
 
 <main class="container mx-auto px-4 py-6 max-w-4xl">
 
-<!-- تنبيه تثبيت التطبيق على الهاتف -->
+<!-- تنبيه تثبيت التطبيق -->
 <div id="install-banner" class="hidden bg-emerald-50 border border-emerald-200 p-4 rounded-2xl mb-6 flex justify-between items-center shadow-sm">
 <div class="flex items-center gap-3">
 <i class="fa-solid fa-mobile-screen-button text-2xl text-emerald-600"></i>
@@ -146,6 +145,25 @@ body { font-family: 'Cairo', sans-serif; }
 <textarea id="item-desc" rows="3" placeholder="مثال: أحتاج نقل بضائع أو معدات..." data-i18n-ph="desc_ph" class="w-full border rounded-xl p-3 bg-gray-50 outline-none" required></textarea>
 </div>
 
+<!-- خيار إضافة عمال شحن وتفريغ المضاف جديداً -->
+<div class="border border-amber-200 bg-amber-50/50 p-4 rounded-xl space-y-3">
+<label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
+<input type="checkbox" id="need-workers" onchange="toggleWorkerFields()" class="w-4 h-4 text-amber-600 rounded">
+<span class="text-sm font-bold text-amber-900" data-i18n="workers_check">طلب عمال للمساعدة في الشحن والتفريغ (اختياري 👷‍♂️)</span>
+</label>
+<div id="workers-container" class="hidden grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="workers_count_label">عدد العمال المطلوبة</label>
+<input type="number" id="workers-count" min="1" value="1" placeholder="مثال: 2" class="w-full border rounded-lg p-2 bg-white text-sm outline-none">
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="worker_price_label">سعر العامل الواحد (دج)</label>
+<input type="number" id="worker-price" min="0" placeholder="مثال: 1500" class="w-full border rounded-lg p-2 bg-white text-sm outline-none">
+</div>
+</div>
+</div>
+
+<!-- التتبع الحي -->
 <div class="border border-blue-100 bg-blue-50/40 p-4 rounded-xl flex items-center justify-between">
 <div class="flex items-center gap-3">
 <i class="fa-solid fa-satellite-dish text-xl text-blue-600"></i>
@@ -160,6 +178,7 @@ body { font-family: 'Cairo', sans-serif; }
 </label>
 </div>
 
+<!-- الفاتورة -->
 <div class="border border-emerald-100 bg-emerald-50/40 p-4 rounded-xl space-y-3">
 <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
 <input type="checkbox" id="has-invoice" onchange="toggleInvoiceFields()" class="w-4 h-4 text-emerald-600 rounded">
@@ -294,6 +313,7 @@ const translations = {
     v_moto: "دراجة نارية (للطلبات الصغيرة والطرود)", v_taxi: "سيارة تاكسي (للكراتين والسلع الخفيفة)", v_van: "شاحنة خفيفة (كاميوني للبضائع المتوسطة)", v_truck: "شاحنة كبيرة (للبضائع الثقيلة)", v_semi: "مقطورة كبرى (Semi-Trailer للحاويات)", v_forklift: "رافعة شوكية (لنقل ورفع السلع)", v_digger: "حفارة / آلة أشغال عمومية",
     confirm_method_label: "طريقة تأكيد التسليم المفضلة", c_otp: "كود سري (OTP)", c_photo: "صورة إثبات التوصيل أو الموقع", c_click: "تأكيد الزبون بضغطة زر", c_qr: "مسح رمز الاستجابة (QR Code)",
     departure_date_label: "تاريخ الانطلاق المحدد", departure_time_label: "توقيت الانطلاق (الموعد)", item_desc_label: "تفاصيل السلعة أو الخدمة المطلوبة", desc_ph: "مثال: أحتاج نقل بضائع أو معدات...", pickup_label: "مكان الاستلام", drop_label: "مكان التسليم",
+    workers_check: "طلب عمال للمساعدة في الشحن والتفريغ (اختياري 👷‍♂️)", workers_count_label: "عدد العمال المطلوبة", worker_price_label: "سعر العامل الواحد (دج)",
     invoice_check: "هذه الرحلة تتطلب نقل فاتورة / وصل بضاعة مرافق", invoice_amount_label: "قيمة البضاعة/المعدة في الفاتورة (دج)", inv_amount_ph: "مثال: 50000", invoice_file_label: "صورة الفاتورة / وصل الإرسال", post_order_btn: "نشر الطلب في السوق", active_orders_title: "طلباتي النشطة", no_active_orders: "لا توجد طلبات نشطة حالياً.",
     driver_reg_title: "انضم إلينا (تسجيل شاحنة أو معدة)", full_name_label: "الاسم الكامل", name_ph: "الاسم واللقب", phone_label: "رقم الهاتف", plate_label: "رقم لوحة المركبة أو التسجيل", plate_ph: "مثال: 01234-116-16", submit_driver_btn: "إرسال طلب الانضمام للمنصة", open_market_title: "السوق المفتوح للطلبات", no_market_orders: "الطلبات المتاحة للتنفيذ ستظهر هنا.",
     admin_panel_title: "إعدادات التشغيل وأرباح المنصة", select_week_label: "اختر الأسبوع الحالي لتطبيق المنصة:", week1: "الأسبوع الأول (بدون عمولة - مجاني 100%)", week2: "الأسبوع الثاني (بدون عمولة - مجاني 100%)", week3: "الأسبوع الثالث فما فوق (تفعيل عمولة 5% للمنصة ✅)", total_revenue_label: "إجمالي أرباح المنصة المحققة:", driver_review_title: "مراجعة السائقين وأصحاب المعدات", no_pending_drivers: "لا توجد طلبات تسجيل معلقة.",
@@ -303,14 +323,18 @@ const translations = {
     app_title: "RAPIDE - Transport & Livraison", tab_client: "Client", tab_driver: "Chauffeurs & Équipements", tab_admin: "Admin & Profits",
     install_title: "Installer l'application RAPIDE", install_desc: "Profitez d'une expérience plus rapide sur votre téléphone.", install_btn: "Installer", order_form_title: "Publier une demande ou offre", vehicle_type_label: "Véhicule ou équipement requis",
     v_moto: "Moto", v_taxi: "Taxi", v_van: "Camionnette", v_truck: "Poids Lourd", v_semi: "Semi-Remorque", v_forklift: "Chariot Élévateur", v_digger: "Pelle Mécanique", confirm_method_label: "Méthode de confirmation de livraison", c_otp: "Code Secret (OTP)", c_photo: "Photo / Localisation", c_click: "Confirmation 1-Clic", c_qr: "Scan QR Code",
-    departure_date_label: "Date de départ prévue", departure_time_label: "Heure de départ prévue", item_desc_label: "Détails de la marchandise", desc_ph: "Ex: Transport de marchandises...", pickup_label: "Lieu de ramassage", drop_label: "Lieu de livraison", invoice_check: "Transport avec facture", invoice_amount_label: "Valeur de la marchandise (DZD)", inv_amount_ph: "Ex: 50000", invoice_file_label: "Photo de la facture", post_order_btn: "Publier la demande", active_orders_title: "Mes demandes actives", no_active_orders: "Aucune demande active.",
+    departure_date_label: "Date de départ prévue", departure_time_label: "Heure de départ prévue", item_desc_label: "Détails de la marchandise", desc_ph: "Ex: Transport de marchandises...", pickup_label: "Lieu de ramassage", drop_label: "Lieu de livraison",
+    workers_check: "Manutentionnaires requis (Optionnel 👷♂️)", workers_count_label: "Nombre d'ouvriers", worker_price_label: "Prix par ouvrier (DZD)",
+    invoice_check: "Transport avec facture", invoice_amount_label: "Valeur de la marchandise (DZD)", inv_amount_ph: "Ex: 50000", invoice_file_label: "Photo de la facture", post_order_btn: "Publier la demande", active_orders_title: "Mes demandes actives", no_active_orders: "Aucune demande active.",
     driver_reg_title: "Rejoignez-nous", full_name_label: "Nom complet", name_ph: "Nom et Prénom", phone_label: "Téléphone", plate_label: "Matricule", plate_ph: "Ex: 01234-116-16", submit_driver_btn: "Envoyer la demande", open_market_title: "Marché ouvert", no_market_orders: "Aucune demande disponible.", admin_panel_title: "Paramètres et Revenus", select_week_label: "Semaine d'exploitation:", week1: "Semaine 1 (Gratuit)", week2: "Semaine 2 (Gratuit)", week3: "Semaine 3+ (Commission 5%)", total_revenue_label: "Revenu total:", driver_review_title: "Validation des Chauffeurs", no_pending_drivers: "Aucune inscription en attente.",
     currency: "DZD", departure: "Départ", from: "De", to: "À", make_offer: "Proposer un prix", complete_delivery: "Confirmer livraison", accept_offer: "Accepter l'offre", active_driver: "Chauffeur assigné", agreed_price: "Prix convenu", otp_msg: "Code OTP:", invoice_val: "Facture de:"
   },
   en: {
     app_title: "RAPIDE - Delivery & Express", tab_client: "Client", tab_driver: "Drivers", tab_admin: "Admin",
     install_title: "Install RAPIDE App", install_desc: "Get a faster experience.", install_btn: "Install", order_form_title: "Add Request or Offer", vehicle_type_label: "Required Vehicle", v_moto: "Motorcycle", v_taxi: "Taxi", v_van: "Light Truck", v_truck: "Heavy Truck", v_semi: "Semi-Trailer", v_forklift: "Forklift", v_digger: "Excavator", confirm_method_label: "Delivery Confirmation", c_otp: "OTP Code", c_photo: "Photo", c_click: "1-Click", c_qr: "QR Code",
-    departure_date_label: "Departure Date", departure_time_label: "Departure Time", item_desc_label: "Cargo Details", desc_ph: "Cargo details...", pickup_label: "Pickup Location", drop_label: "Drop Location", invoice_check: "Includes Invoice", invoice_amount_label: "Invoice Amount (DZD)", inv_amount_ph: "Ex: 50000", invoice_file_label: "Invoice Image", post_order_btn: "Post Request", active_orders_title: "Active Requests", no_active_orders: "No active requests.",
+    departure_date_label: "Departure Date", departure_time_label: "Departure Time", item_desc_label: "Cargo Details", desc_ph: "Cargo details...", pickup_label: "Pickup Location", drop_label: "Drop Location",
+    workers_check: "Request Loaders/Unloaders (Optional 👷♂️)", workers_count_label: "Number of Workers", worker_price_label: "Price per Worker (DZD)",
+    invoice_check: "Includes Invoice", invoice_amount_label: "Invoice Amount (DZD)", inv_amount_ph: "Ex: 50000", invoice_file_label: "Invoice Image", post_order_btn: "Post Request", active_orders_title: "Active Requests", no_active_orders: "No active requests.",
     driver_reg_title: "Join Us", full_name_label: "Full Name", name_ph: "Name", phone_label: "Phone", plate_label: "Plate Number", plate_ph: "01234-116-16", submit_driver_btn: "Submit", open_market_title: "Open Market", no_market_orders: "No orders.", admin_panel_title: "Platform Admin", select_week_label: "Operating Week:", week1: "Week 1 (Free)", week2: "Week 2 (Free)", week3: "Week 3+ (5% Fee)", total_revenue_label: "Total Revenue:", driver_review_title: "Review Drivers", no_pending_drivers: "No pending drivers.",
     currency: "DZD", departure: "Departure", from: "From", to: "To", make_offer: "Make Offer", complete_delivery: "Complete Delivery", accept_offer: "Accept Offer", active_driver: "Driver", agreed_price: "Price", otp_msg: "OTP:", invoice_val: "Invoice:"
   }
@@ -333,7 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
   populateWilayas();
   applyLanguage(currentLang);
 
-  // تسجيل ה-Service Worker للتطبيق الشبكي PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
       .then(reg => console.log('Service Worker Registered!', reg))
@@ -433,6 +456,13 @@ function toggleInvoiceFields() {
   else { container.classList.add('hidden'); container.classList.remove('grid'); }
 }
 
+function toggleWorkerFields() {
+  const needWorkers = document.getElementById('need-workers').checked;
+  const container = document.getElementById('workers-container');
+  if (needWorkers) { container.classList.remove('hidden'); container.classList.add('grid'); }
+  else { container.classList.add('hidden'); container.classList.remove('grid'); }
+}
+
 function updateProjectWeek() {
   currentWeek = parseInt(document.getElementById('current-week-select').value);
   saveData();
@@ -458,6 +488,11 @@ function handlePostOrder(e) {
   const pickup = pGps ? `GPS (${pGps})` : `${pWilaya} - ${pCommune}`;
   const drop = dGps ? `GPS (${dGps})` : `${dWilaya} - ${dCommune}`;
 
+  const needWorkers = document.getElementById('need-workers').checked;
+  const workersCount = needWorkers ? (parseInt(document.getElementById('workers-count').value) || 1) : 0;
+  const workerPrice = needWorkers ? (parseFloat(document.getElementById('worker-price').value) || 0) : 0;
+  const totalWorkersCost = workersCount * workerPrice;
+
   const enableLiveGps = document.getElementById('enable-live-gps').checked;
   const hasInvoice = document.getElementById('has-invoice').checked;
   const invoiceAmount = hasInvoice ? (document.getElementById('invoice-amount').value || 0) : 0;
@@ -467,6 +502,7 @@ function handlePostOrder(e) {
   const newOrder = {
     id: Date.now(),
     vehicle, confirmMethod, depDate, depTime, desc, pickup, drop, pGps, dGps, enableLiveGps, hasInvoice, invoiceAmount, otpCode,
+    needWorkers, workersCount, workerPrice, totalWorkersCost,
     status: 'في انتظار العروض', offers: [], assignedDriver: null, finalPrice: 0
   };
 
@@ -476,6 +512,7 @@ function handlePostOrder(e) {
   
   document.getElementById('order-form').reset();
   toggleInvoiceFields();
+  toggleWorkerFields();
   alert(currentLang === 'ar' ? 'تم نشر طلبك بنجاح في سريعة!' : 'Demande publiée avec succès sur RAPIDE!');
 }
 
@@ -576,6 +613,7 @@ function renderClientOrders() {
             <i class="fa-regular fa-clock"></i> ${t.departure}: ${order.depDate} | ${order.depTime}
           </div>
           <p class="text-xs text-gray-500 mt-1">${t.from}: <strong class="text-gray-700">${order.pickup}</strong> ${t.to}: <strong class="text-gray-700">${order.drop}</strong></p>
+          ${order.needWorkers ? `<p class="text-xs text-amber-800 bg-amber-100/60 inline-block px-2 py-0.5 rounded mt-1 font-bold">👷♂️ عمال مطلوبين: ${order.workersCount} (تكلفتهم: ${order.totalWorkersCost} دج)</p>` : ''}
         </div>
         <span class="text-xs font-bold px-2 py-1 rounded ${order.status === 'مكتمل ✅' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${order.status}</span>
       </div>
@@ -631,6 +669,7 @@ function renderDriverOrders() {
             <i class="fa-regular fa-clock"></i> ${t.departure}: ${order.depDate} | ${order.depTime}
           </div>
           <p class="text-xs text-gray-500 mt-1">${t.from}: <strong>${order.pickup}</strong> ➡ ${t.to}: <strong>${order.drop}</strong></p>
+          ${order.needWorkers ? `<p class="text-xs text-amber-800 bg-amber-100/60 inline-block px-2 py-0.5 rounded mt-1 font-bold">👷♂️ مطلوب عمال شحن: ${order.workersCount} (إجمالي السعر: ${order.totalWorkersCost} دج)</p>` : ''}
         </div>
         <span class="text-xs font-bold px-2 py-1 rounded bg-amber-100 text-amber-700">${order.status}</span>
       </div>
