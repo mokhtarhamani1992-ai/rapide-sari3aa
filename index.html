@@ -1,654 +1,596 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="html-root">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سريعة (RAPIDE) - المنصة المتكاملة للنقل، الفلاحة، و Retour +</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
+<head>  
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سريعة (RAPIDE) - نقل وتوصيل البضائع والمعدات</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#059669">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="سريعة RAPIDE">
+<link rel="manifest" href="manifest.json">
+<style>
+body { font-family: 'Cairo', sans-serif; }
+</style>
 </head>
-<body class="bg-gray-100 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
+<body class="bg-gray-50 text-gray-800">
 
-    <!-- Toast Notification (تنبيه منبثق سريعة) -->
-    <div id="toast" class="fixed top-5 left-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl transform -translate-y-28 opacity-0 transition-all duration-300 flex items-center space-x-3 space-x-reverse border border-slate-700">
-        <i id="toast-icon" class="fas fa-bell text-amber-400 text-lg"></i>
-        <span id="toast-message" class="font-bold text-xs">تنبيه جديد</span>
+<!-- Header -->
+<header class="bg-emerald-600 text-white shadow-md sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+<div class="flex items-center space-x-2 space-x-reverse">
+<i class="fa-solid fa-truck-fast text-2xl"></i>
+<h1 class="text-xl font-bold" data-i18n="app_title">سريعة (RAPIDE)</h1>
+</div>
+<div class="flex items-center space-x-2 space-x-reverse text-xs md:text-sm">
+<select id="lang-select" onchange="changeLanguage(this.value)" class="bg-emerald-700 text-white rounded-lg px-2 py-1 outline-none text-xs font-bold border border-emerald-500">
+<option value="ar">العربية (AR)</option>
+<option value="fr">Français (FR)</option>
+<option value="en">English (EN)</option>
+</select>
+<button onclick="switchTab('client')" id="btn-client" class="bg-emerald-700 px-3 py-1.5 rounded-lg font-semibold transition" data-i18n="tab_client">الزبون</button>
+<button onclick="switchTab('driver')" id="btn-driver" class="bg-emerald-800/60 px-3 py-1.5 rounded-lg font-semibold transition" data-i18n="tab_driver">السائقين والمعدات</button>
+<button onclick="switchTab('admin')" id="btn-admin" class="bg-emerald-800/60 px-3 py-1.5 rounded-lg font-semibold transition" data-i18n="tab_admin">الإدارة والأرباح</button>
+</div>
+</div>
+</header>
+
+<main class="container mx-auto px-4 py-6 max-w-4xl">
+
+<!-- تنبيه تثبيت التطبيق -->
+<div id="install-banner" class="hidden bg-emerald-50 border border-emerald-200 p-4 rounded-2xl mb-6 flex justify-between items-center shadow-sm">
+<div class="flex items-center gap-3">
+<i class="fa-solid fa-mobile-screen-button text-2xl text-emerald-600"></i>
+<div>
+<h3 class="font-bold text-sm text-emerald-900" data-i18n="install_title">ثبت تطبيق سريعة RAPIDE على هاتفك</h3>
+<p class="text-xs text-emerald-700" data-i18n="install_desc">احصل على تجربة أسرع وأشبه بتطبيقات المتجر الرسمية.</p>
+</div>
+</div>
+<button id="install-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition" data-i18n="install_btn">تثبيت الآن</button>
+</div>
+
+<!-- Client Section -->
+<section id="tab-client" class="space-y-6">
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-emerald-700 flex items-center gap-2">
+<i class="fa-solid fa-box-open"></i>
+<span data-i18n="order_form_title">أضف طلبك أو عرضك (سلع أو معدات ثقيلة)</span>
+</h2>
+<form id="order-form" onsubmit="handlePostOrder(event)" class="space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="vehicle_type_label">وسيلة النقل أو المعدة المطلوبة</label>
+<select id="vehicle-type" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+<option value="دراجة نارية (موتور)">دراجة نارية (للطلبات الصغيرة والطرود)</option>
+<option value="سيارة تاكسي">سيارة تاكسي (للكراتين والسلع الخفيفة)</option>
+<option value="شاحنة خفيفة (كاميوني)">شاحنة خفيفة (كاميوني للبضائع المتوسطة)</option>
+<option value="شاحنة كبيرة (Poids Lourd)">شاحنة كبيرة (للبضائع الثقيلة)</option>
+<option value="مقطورة كبرى (Semi-Trailer)">مقطورة كبرى (Semi-Trailer للحاويات)</option>
+<option value="رافعة شوكية (Chariot Élévateur)">رافعة شوكية (لنقل ورفع السلع)</option>
+<option value="حفارة / آلة أشغال (Pelle Mécanique)">حفارة / آلة أشغال عمومية</option>
+<option value="جرار فلاحي">جرار فلاحي (للحراثة والخدمات الفلاحية)</option>
+<option value="شاحنة صهريج ماء">شاحنة صهريج ماء (للسقي ونقل السوائل)</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="confirm_method_label">طريقة تأكيد التسليم المفضلة</label>
+<select id="confirmation-method" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+<option value="otp">كود سري (OTP)</option>
+<option value="photo">صورة إثبات التوصيل أو الموقع</option>
+<option value="oneclick">تأكيد الزبون بضغطة زر</option>
+<option value="qrcode">مسح رمز الاستجابة (QR Code)</option>
+</select>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="departure_date_label">تاريخ الانطلاق المحدد</label>
+<input type="date" id="departure-date" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none" required>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="departure_time_label">توقيت الانطلاق (الموعد)</label>
+<input type="time" id="departure-time" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none" required>
+</div>
+</div>
+
+<div class="border border-emerald-100 bg-emerald-50/30 p-4 rounded-xl space-y-4">
+<h3 class="text-sm font-bold text-emerald-800 flex items-center justify-between">
+<span><i class="fa-solid fa-location-dot text-emerald-600"></i> تحديد مكان الاستلام والتسليم (الجزائر)</span>
+<span class="text-xs font-normal text-emerald-600">اختياري بالـ GPS أو اختيار الولاية</span>
+</h3>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="block text-xs font-bold text-gray-700" data-i18n="pickup_label">مكان الاستلام (الولاية والبلدية)</label>
+<div class="grid grid-cols-2 gap-2">
+<select id="pickup-wilaya" onchange="loadCommunes('pickup-wilaya', 'pickup-commune')" class="border rounded-lg p-2 bg-white text-xs outline-none">
+<option value="">اختر الولاية...</option>
+</select>
+<select id="pickup-commune" class="border rounded-lg p-2 bg-white text-xs outline-none">
+<option value="">اختر البلدية...</option>
+</select>
+</div>
+<button type="button" onclick="getCurrentLocation('pickup')" class="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold py-1.5 rounded-lg transition flex items-center justify-center gap-1">
+<i class="fa-solid fa-crosshairs"></i> تحديد موقع الاستلام عبر GPS 📍
+</button>
+<input type="hidden" id="pickup-gps">
+</div>
+
+<div class="space-y-2">
+<label class="block text-xs font-bold text-gray-700" data-i18n="drop_label">مكان التسليم (الولاية والبلدية)</label>
+<div class="grid grid-cols-2 gap-2">
+<select id="drop-wilaya" onchange="loadCommunes('drop-wilaya', 'drop-commune')" class="border rounded-lg p-2 bg-white text-xs outline-none">
+<option value="">اختر الولاية...</option>
+</select>
+<select id="drop-commune" class="border rounded-lg p-2 bg-white text-xs outline-none">
+<option value="">اختر البلدية...</option>
+</select>
+</div>
+<button type="button" onclick="getCurrentLocation('drop')" class="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-bold py-1.5 rounded-lg transition flex items-center justify-center gap-1">
+<i class="fa-solid fa-crosshairs"></i> تحديد موقع التسليم عبر GPS 📍
+</button>
+<input type="hidden" id="drop-gps">
+</div>
+</div>
+</div>
+
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="item_desc_label">تفاصيل السلعة أو الخدمة المطلوبة</label>
+<textarea id="item-desc" rows="3" placeholder="مثال: أحتاج نقل بضائع أو معدات..." class="w-full border rounded-xl p-3 bg-gray-50 outline-none" required></textarea>
+</div>
+
+<!-- عمال شحن وتفريغ -->
+<div class="border border-amber-200 bg-amber-50/50 p-4 rounded-xl space-y-3">
+<label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
+<input type="checkbox" id="need-workers" onchange="toggleWorkerFields()" class="w-4 h-4 text-amber-600 rounded">
+<span class="text-sm font-bold text-amber-900" data-i18n="workers_check">طلب عمال للمساعدة في الشحن والتفريغ (اختياري 👷‍♂️)</span>
+</label>
+<div id="workers-container" class="hidden grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="workers_count_label">عدد العمال المطلوبة</label>
+<input type="number" id="workers-count" min="1" value="1" placeholder="مثال: 2" class="w-full border rounded-lg p-2 bg-white text-sm outline-none">
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 mb-1" data-i18n="worker_price_label">سعر العامل الواحد (دج)</label>
+<input type="number" id="worker-price" min="0" placeholder="مثال: 1500" class="w-full border rounded-lg p-2 bg-white text-sm outline-none">
+</div>
+</div>
+</div>
+
+<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md" data-i18n="post_order_btn">
+نشر الطلب في السوق
+</button>
+</form>
+</div>
+
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h3 class="text-md font-bold mb-4 text-gray-700" data-i18n="active_orders_title">طلباتي النشطة</h3>
+<div id="client-orders-list" class="space-y-4">
+<p class="text-gray-400 text-center py-4" data-i18n="no_active_orders">لا توجد طلبات نشطة حالياً.</p>
+</div>
+</div>
+</section>
+
+<!-- Driver Section -->
+<section id="tab-driver" class="space-y-6 hidden">
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-emerald-700 flex items-center gap-2">
+<i class="fa-solid fa-id-card"></i>
+<span data-i18n="driver_reg_title">انضم إلينا (تسجيل شاحنة أو معدة)</span>
+</h2>
+<form id="driver-reg-form" onsubmit="handleDriverRegister(event)" class="space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="full_name_label">الاسم الكامل</label>
+<input type="text" id="d-name" placeholder="الاسم واللقب" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="phone_label">رقم الهاتف</label>
+<input type="tel" id="d-phone" placeholder="05XXXXXXXX" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="vehicle_type_label">نوع المركبة أو المعدة</label>
+<select id="d-vehicle" class="w-full border rounded-xl p-2.5 bg-gray-50">
+<option value="دراجة نارية (موتور)">دراجة نارية</option>
+<option value="سيارة تاكسي">سيارة تاكسي</option>
+<option value="شاحنة خفيفة (كاميوني)">شاحنة خفيفة (كاميوني)</option>
+<option value="شاحنة كبيرة (Poids Lourd)">شاحنة كبيرة</option>
+<option value="مقطورة كبرى (Semi-Trailer)">مقطورة كبرى</option>
+<option value="رافعة شوكية (Chariot Élévateur)">رافعة شوكية</option>
+<option value="حفارة / آلة أشغال (Pelle Mécanique)">حفارة / آلة أشغال</option>
+<option value="جرار فلاحي">جرار فلاحي</option>
+<option value="شاحنة صهريج ماء">شاحنة صهريج ماء</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1" data-i18n="plate_label">رقم لوحة المركبة أو التسجيل</label>
+<input type="text" id="d-plate" placeholder="مثال: 01234-116-16" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+</div>
+<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition" data-i18n="submit_driver_btn">
+إرسال طلب الانضمام للمنصة
+</button>
+</form>
+</div>
+
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-emerald-700 flex items-center gap-2">
+<i class="fa-solid fa-route"></i>
+<span data-i18n="open_market_title">السوق المفتوح للطلبات</span>
+</h2>
+<div id="driver-orders-list" class="space-y-4">
+<p class="text-gray-400 text-center py-4" data-i18n="no_market_orders">الطلبات المتاحة للتنفيذ ستظهر هنا.</p>
+</div>
+</div>
+</section>
+
+<!-- Admin Section -->
+<section id="tab-admin" class="space-y-6 hidden">
+<div class="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl shadow-sm space-y-4">
+<h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2">
+<i class="fa-solid fa-chart-line"></i>
+<span data-i18n="admin_panel_title">إعدادات التشغيل وأرباح المنصة</span>
+</h2>
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border">
+<div>
+<label class="block text-sm font-bold text-gray-700 mb-1" data-i18n="select_week_label">اختر الأسبوع الحالي لتطبيق المنصة:</label>
+<select id="current-week-select" onchange="updateProjectWeek()" class="border rounded-lg p-2 bg-gray-50 text-sm font-bold text-emerald-700 outline-none">
+<option value="1">الأسبوع الأول (بدون عمولة - مجاني 100%)</option>
+<option value="2">الأسبوع الثاني (بدون عمولة - مجاني 100%)</option>
+<option value="3" selected>الأسبوع الثالث فما فوق (تفعيل عمولة 5% للمنصة ✅)</option>
+</select>
+</div>
+<div class="text-center md:text-left">
+<span class="text-xs text-gray-500 block" data-i18n="total_revenue_label">إجمالي أرباح المنصة المحققة:</span>
+<span id="total-admin-revenue" class="text-2xl font-extrabold text-emerald-600">0 دج</span>
+</div>
+</div>
+</div>
+
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-red-600 flex items-center gap-2">
+<i class="fa-solid fa-user-shield"></i> <span data-i18n="driver_review_title">مراجعة السائقين وأصحاب المعدات</span>
+</h2>
+<div id="admin-drivers-list" class="space-y-4">
+<p class="text-gray-400 text-center py-4" data-i18n="no_pending_drivers">لا توجد طلبات تسجيل معلقة.</p>
+</div>
+</div>
+</section>
+
+</main>
+
+<script>
+const dzWilayas = [
+  { code: '01', name: 'أدرار - Adrar', communes: ['أدرار', 'تيميمون', 'رقان'] },
+  { code: '02', name: 'الشلف - Chlef', communes: ['الشلف', 'تنس', 'بوقادير'] },
+  { code: '16', name: 'الجزائر العاصمة - Algiers', communes: ['الجزائر الوسطى', 'باب الوادي', 'الرويبة', 'زرالدة'] },
+  { code: '17', name: 'الجلفة - Djelfa', communes: ['الجلفة', 'مسعد', 'حاسي بحبح', 'عين وسارة'] },
+  { code: '27', name: 'مستغانم - Mostaganem', communes: ['مستغانم', 'عين تادلس', 'حاسي ماماش', 'سيدي علي'] },
+  { code: '31', name: 'وهران - Oran', communes: ['وهران', 'بئر الجير', 'السانية', 'ارزيو'] }
+];
+
+let orders = JSON.parse(localStorage.getItem('camio_orders')) || [];
+let drivers = JSON.parse(localStorage.getItem('camio_drivers')) || [{ id: 1, name: 'سليم بوحجر', phone: '0555123456', vehicle: 'شاحنة كبيرة (Poids Lourd)', plate: '01234-116-16', status: 'مفعل ✅' }];
+let currentWeek = parseInt(localStorage.getItem('camio_week')) || 3;
+let platformRevenue = parseFloat(localStorage.getItem('camio_revenue')) || 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const weekSelect = document.getElementById('current-week-select');
+  if(weekSelect) weekSelect.value = currentWeek;
+  
+  const departureDate = document.getElementById('departure-date');
+  if(departureDate) {
+    const today = new Date().toISOString().split('T')[0];
+    departureDate.value = today;
+    departureDate.min = today;
+  }
+  
+  populateWilayas();
+  renderAll();
+});
+
+function populateWilayas() {
+  const pSelect = document.getElementById('pickup-wilaya');
+  const dSelect = document.getElementById('drop-wilaya');
+  if(!pSelect || !dSelect) return;
+  pSelect.innerHTML = '<option value="">اختر الولاية...</option>';
+  dSelect.innerHTML = '<option value="">اختر الولاية...</option>';
+  
+  dzWilayas.forEach(w => {
+    pSelect.innerHTML += `<option value="${w.name}">${w.code} - ${w.name}</option>`;
+    dSelect.innerHTML += `<option value="${w.name}">${w.code} - ${w.name}</option>`;
+  });
+}
+
+function loadCommunes(wilayaSelectId, communeSelectId) {
+  const wilayaValue = document.getElementById(wilayaSelectId).value;
+  const communeSelect = document.getElementById(communeSelectId);
+  if(!communeSelect) return;
+  communeSelect.innerHTML = '<option value="">اختر البلدية...</option>';
+  
+  const found = dzWilayas.find(w => w.name === wilayaValue);
+  if (found) {
+    found.communes.forEach(c => {
+      communeSelect.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+  }
+}
+
+function getCurrentLocation(type) {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      const gpsInput = document.getElementById(`${type}-gps`);
+      if(gpsInput) gpsInput.value = `${lat},${lng}`;
+      alert(`تم الحصول على إحداثيات الموقع بنجاح: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+    }, () => { alert("تعذر تحديد الموقع الجغرافي عبر GPS."); });
+  } else { alert("متصفحك لا يدعم الـ GPS."); }
+}
+
+function saveData() {
+  localStorage.setItem('camio_orders', JSON.stringify(orders));
+  localStorage.setItem('camio_drivers', JSON.stringify(drivers));
+  localStorage.setItem('camio_week', currentWeek);
+  localStorage.setItem('camio_revenue', platformRevenue);
+}
+
+function switchTab(tabName) {
+  ['client', 'driver', 'admin'].forEach(t => {
+    const tabEl = document.getElementById('tab-' + t);
+    const btnEl = document.getElementById('btn-' + t);
+    if(tabEl) tabEl.classList.add('hidden');
+    if(btnEl) btnEl.className = "bg-emerald-800/60 px-3 py-1.5 rounded-lg font-semibold transition";
+  });
+
+  const activeTab = document.getElementById('tab-' + tabName);
+  const activeBtn = document.getElementById('btn-' + tabName);
+  if(activeTab) activeTab.classList.remove('hidden');
+  if(activeBtn) activeBtn.className = "bg-emerald-700 px-3 py-1.5 rounded-lg font-semibold transition";
+}
+
+function toggleInvoiceFields() {
+  const hasInvoice = document.getElementById('has-invoice')?.checked;
+  const container = document.getElementById('invoice-container');
+  if(!container) return;
+  if (hasInvoice) { container.classList.remove('hidden'); container.classList.add('grid'); }
+  else { container.classList.add('hidden'); container.classList.remove('grid'); }
+}
+
+function toggleWorkerFields() {
+  const needWorkers = document.getElementById('need-workers')?.checked;
+  const container = document.getElementById('workers-container');
+  if(!container) return;
+  if (needWorkers) { container.classList.remove('hidden'); container.classList.add('grid'); }
+  else { container.classList.add('hidden'); container.classList.remove('grid'); }
+}
+
+function updateProjectWeek() {
+  const weekSelect = document.getElementById('current-week-select');
+  if(weekSelect) {
+    currentWeek = parseInt(weekSelect.value);
+    saveData();
+    renderAll();
+  }
+}
+
+function handlePostOrder(e) {
+  e.preventDefault();
+  const vehicle = document.getElementById('vehicle-type').value;
+  const confirmMethod = document.getElementById('confirmation-method').value;
+  const depDate = document.getElementById('departure-date').value;
+  const depTime = document.getElementById('departure-time').value;
+  const desc = document.getElementById('item-desc').value;
+  
+  const pWilaya = document.getElementById('pickup-wilaya').value;
+  const pCommune = document.getElementById('pickup-commune').value;
+  const pGps = document.getElementById('pickup-gps').value;
+  
+  const dWilaya = document.getElementById('drop-wilaya').value;
+  const dCommune = document.getElementById('drop-commune').value;
+  const dGps = document.getElementById('drop-gps').value;
+
+  const pickup = pGps ? `GPS (${pGps})` : `${pWilaya} - ${pCommune}`;
+  const drop = dGps ? `GPS (${dGps})` : `${dWilaya} - ${dCommune}`;
+
+  const needWorkers = document.getElementById('need-workers').checked;
+  const workersCount = needWorkers ? (parseInt(document.getElementById('workers-count').value) || 1) : 0;
+  const workerPrice = needWorkers ? (parseFloat(document.getElementById('worker-price').value) || 0) : 0;
+  const totalWorkersCost = workersCount * workerPrice;
+
+  const enableLiveGps = document.getElementById('enable-live-gps').checked;
+  const hasInvoice = document.getElementById('has-invoice').checked;
+  const invoiceAmount = hasInvoice ? (document.getElementById('invoice-amount').value || 0) : 0;
+  
+  const otpCode = Math.floor(1000 + Math.random() * 9000);
+
+  const newOrder = {
+    id: Date.now(),
+    vehicle, confirmMethod, depDate, depTime, desc, pickup, drop, pGps, dGps, enableLiveGps, hasInvoice, invoiceAmount, otpCode,
+    needWorkers, workersCount, workerPrice, totalWorkersCost,
+    status: 'في انتظار العروض', offers: [], assignedDriver: null, finalPrice: 0
+  };
+
+  orders.unshift(newOrder);
+  saveData();
+  renderAll();
+  
+  document.getElementById('order-form').reset();
+  toggleInvoiceFields();
+  toggleWorkerFields();
+  alert('تم نشر طلبك بنجاح في سريعة!');
+}
+
+function shareOnWhatsApp(orderId) {
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  const text = `تطبيق سريعة RAPIDE - تتبع الشاحنة والرحلة 🚚\nنوع الطلب: ${order.desc}\nالمركبة: ${order.vehicle}\nمن: ${order.pickup}\nإلى: ${order.drop}\nرابط التتبع الحي GPS: https://maps.google.com/?q=${order.pGps || '35.6971,0.6308'}`;
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function handleMakeOffer(orderId) {
+  const driverName = prompt("أدخل اسمك كسائق:");
+  if (!driverName) return;
+
+  const price = prompt("أدخل السعر المقترح (دج):");
+  if (!price || isNaN(price)) return;
+
+  const order = orders.find(o => o.id === orderId);
+  if (order) {
+    order.offers.push({ driverName, price: parseFloat(price) });
+    saveData();
+    renderAll();
+    alert('تم إرسال عرضك بنجاح!');
+  }
+}
+
+function acceptOffer(orderId, offerIndex) {
+  const order = orders.find(o => o.id === orderId);
+  if (order) {
+    const offer = order.offers[offerIndex];
+    order.assignedDriver = offer.driverName;
+    order.finalPrice = offer.price;
+    order.status = 'مؤكد 🚚';
+
+    if (currentWeek >= 3) {
+      const commission = order.finalPrice * 0.05;
+      platformRevenue += commission;
+    }
+    saveData();
+    renderAll();
+  }
+}
+
+function handleDriverRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('d-name').value;
+  const phone = document.getElementById('d-phone').value;
+  const vehicle = document.getElementById('d-vehicle').value;
+  const plate = document.getElementById('d-plate').value;
+
+  drivers.push({ id: Date.now(), name, phone, vehicle, plate, status: 'في انتظار المراجعة ⏳' });
+  saveData();
+  renderAll();
+  document.getElementById('driver-reg-form').reset();
+  alert('تم إرسال طلب الانضمام بنجاح!');
+}
+
+function approveDriver(driverId) {
+  const driver = drivers.find(d => d.id === driverId);
+  if (driver) {
+    driver.status = 'مفعل ✅';
+    saveData();
+    renderAll();
+  }
+}
+
+function renderAll() {
+  renderClientOrders();
+  renderDriverOrders();
+  renderAdminPanel();
+}
+
+function renderClientOrders() {
+  const container = document.getElementById('client-orders-list');
+  if(!container) return;
+
+  if (orders.length === 0) {
+    container.innerHTML = `<p class="text-gray-400 text-center py-4">لا توجد طلبات نشطة حالياً.</p>`;
+    return;
+  }
+
+  container.innerHTML = orders.map(order => `
+    <div class="border rounded-xl p-4 bg-gray-50 space-y-3">
+      <div class="flex justify-between items-start">
+        <div>
+          <span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-lg font-bold">${order.vehicle}</span>
+          <h4 class="font-bold text-gray-800 mt-2">${order.desc}</h4>
+          <p class="text-xs text-gray-500 mt-1">من: <strong>${order.pickup}</strong> | إلى: <strong>${order.drop}</strong></p>
+          ${order.hasInvoice ? `<p class="text-xs text-amber-700 font-bold mt-1">مرفق بفاتورة بقيمة: ${order.invoiceAmount} دج</p>` : ''}
+          ${order.needWorkers ? `<p class="text-xs text-blue-700 font-bold mt-1">👷‍♂️ عمال شحن: ${order.workersCount} (تلفة: ${order.totalWorkersCost} دج)</p>` : ''}
+        </div>
+        <span class="text-xs font-bold px-2.5 py-1 rounded ${order.status.includes('مؤكد') ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${order.status}</span>
+      </div>
+
+      ${order.assignedDriver ? `
+        <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs space-y-2">
+          <p><strong>السائق المتكفل:</strong> ${order.assignedDriver} | <strong>السعر المتفق عليه:</strong> ${order.finalPrice} دج</p>
+          ${order.confirmMethod === 'otp' ? `<p class="text-emerald-800 font-bold bg-emerald-100 px-2 py-1 rounded inline-block">كود التحقق الخاص بك (OTP): <span class="text-lg tracking-wider">${order.otpCode}</span></p>` : ''}
+          ${order.enableLiveGps ? `<button onclick="shareOnWhatsApp(${order.id})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 mt-2"><i class="fa-brands fa-whatsapp text-sm"></i> مشاركة التتبع عبر WhatsApp</button>` : ''}
+        </div>
+      ` : ''}
+
+      ${order.offers.length > 0 && !order.assignedDriver ? `
+        <div class="border-t pt-3 space-y-2">
+          <p class="text-xs font-bold text-gray-700">العروض المقدمة:</p>
+          ${order.offers.map((offer, idx) => `
+            <div class="flex justify-between items-center bg-white p-2 rounded-lg border text-xs">
+              <span><strong>${offer.driverName}</strong>: <span class="text-emerald-600 font-bold">${offer.price} دج</span></span>
+              <button onclick="acceptOffer(${order.id}, ${idx})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg font-bold">قبول العرض</button>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
     </div>
+  `).join('');
+}
 
-    <!-- Header -->
-    <header class="bg-emerald-600 text-white shadow-md sticky top-0 z-40">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-5xl">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-truck-fast text-2xl text-amber-300"></i>
-                <h1 class="text-xl font-bold" data-i18n="app_title">سريعة (RAPIDE) <span class="text-xs bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full font-extrabold">DZ ➔ EU 🌍</span></h1>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <!-- Notifications Bell Icon -->
-                <div class="relative">
-                    <button onclick="toggleNotifications()" class="relative p-2 bg-emerald-700 hover:bg-emerald-800 rounded-xl text-white transition focus:outline-none">
-                        <i class="fa-solid fa-bell text-lg"></i>
-                        <span id="notif-badge" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-emerald-600 animate-pulse">0</span>
-                    </button>
+function renderDriverOrders() {
+  const container = document.getElementById('driver-orders-list');
+  if(!container) return;
 
-                    <!-- Notifications Dropdown Panel -->
-                    <div id="notif-panel" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 text-gray-800 overflow-hidden">
-                        <div class="p-3.5 bg-slate-900 text-white flex justify-between items-center">
-                            <span class="font-bold text-xs flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> مركز الإشعارات الفورية</span>
-                            <button onclick="clearNotifications()" class="text-[10px] text-gray-400 hover:text-rose-400 font-semibold" data-i18n="clear_all">مسح الكل</button>
-                        </div>
-                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-100 text-xs">
-                            <p class="text-center py-6 text-gray-400" data-i18n="no_notifs">لا توجد إشعارات جديدة حالياً 🔕</p>
-                        </div>
-                    </div>
-                </div>
+  const pending = orders.filter(o => !o.assignedDriver);
+  if (pending.length === 0) {
+    container.innerHTML = `<p class="text-gray-400 text-center py-4">الطلبات المتاحة للتنفيذ ستظهر هنا.</p>`;
+    return;
+  }
 
-                <!-- Language Selector -->
-                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-emerald-700 text-white rounded-xl px-2 py-1.5 outline-none text-xs font-bold border border-emerald-500">
-                    <option value="ar">العربية (AR)</option>
-                    <option value="fr">Français (FR)</option>
-                    <option value="en">English (EN)</option>
-                </select>
-            </div>
+  container.innerHTML = pending.map(order => `
+    <div class="border rounded-xl p-4 bg-gray-50 space-y-3">
+      <div class="flex justify-between items-start">
+        <div>
+          <span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-lg font-bold">${order.vehicle}</span>
+          <h4 class="font-bold text-gray-800 mt-2">${order.desc}</h4>
+          <p class="text-xs text-gray-500 mt-1">من: <strong>${order.pickup}</strong> | إلى: <strong>${order.drop}</strong></p>
         </div>
+        <button onclick="handleMakeOffer(${order.id})" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">تقديم عرض سعر</button>
+      </div>
+    </div>
+  `).join('');
+}
 
-        <!-- Navigation Tabs -->
-        <div class="bg-emerald-700 border-t border-emerald-500/40 overflow-x-auto">
-            <div class="container mx-auto px-4 flex justify-around max-w-5xl text-xs sm:text-sm font-bold whitespace-nowrap">
-                <button onclick="switchTab('client')" id="tab-client" class="py-2.5 px-3 border-b-2 border-amber-300 text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-box"></i> <span data-i18n="tab_local">طلب محلي وفلاحي</span>
-                </button>
-                <button onclick="switchTab('dz-to-eu')" id="tab-dz-to-eu" class="py-2.5 px-3 border-b-2 border-transparent text-amber-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-plane-arrival"></i> <span data-i18n="tab_dztceu">من الجزائر لأوروبا 🇩🇿➔🇪🇺</span>
-                </button>
-                <button onclick="switchTab('europe')" id="tab-europe" class="py-2.5 px-3 border-b-2 border-transparent text-amber-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-earth-europe"></i> <span data-i18n="tab_eutodz">من أوروبا للجزائر 🇪🇺➔🇩🇿</span>
-                </button>
-                <button onclick="switchTab('retour')" id="tab-retour" class="py-2.5 px-3 border-b-2 border-transparent text-amber-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-rotate-left"></i> <span>Retour + 🔄</span>
-                </button>
-                <button onclick="switchTab('driver')" id="tab-driver" class="py-2.5 px-3 border-b-2 border-transparent text-emerald-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-gavel"></i> <span data-i18n="tab_auction">المزايدة</span>
-                </button>
-            </div>
-        </div>
-    </header>
+function renderAdminPanel() {
+  const revEl = document.getElementById('total-admin-revenue');
+  if(revEl) revEl.innerText = `${platformRevenue.toLocaleString()} دج`;
 
-    <!-- Main Container -->
-    <main class="container mx-auto px-4 py-6 max-w-5xl flex-1 space-y-6">
+  const container = document.getElementById('admin-drivers-list');
+  if(!container) return;
 
-        <!-- 1. LOCAL CLIENT VIEW -->
-        <section id="view-client" class="space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-gavel text-emerald-600"></i>
-                    <span data-i18n="local_form_title">نشر طلب نقل محلي أو خدمة فلاحية (مع نظام المزايدة 📉)</span>
-                </h2>
+  if (drivers.length === 0) {
+    container.innerHTML = `<p class="text-gray-400 text-center py-4">لا توجد طلبات تسجيل معلقة.</p>`;
+    return;
+  }
 
-                <form id="order-form" onsubmit="createOrder(event)" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="vehicle_label">نوع المركبة أو الآلة الفلاحية</label>
-                            <select id="vehicle-type" class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none">
-                                <option value="شاحنة خفيفة (كاميوني)">شاحنة خفيفة (كاميوني للبضائع)</option>
-                                <option value="شاحنة نقل رمال وحصى (Benne)">شاحنة نقل رمال وحصى (Benne)</option>
-                                <option value="شاحنة صهريج ماء (Citerne)">شاحنة صهريج (نقل المياه والسوائل)</option>
-                                <option value="جرار فلاحي (Tracteur)">جرار فلاحي (حرث ونقل)</option>
-                                <option value="شاحنة مبردة">شاحنة مبردة للمحاصيل</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="budget_label">الميزانية القصوى المقترحة (دج)</label>
-                            <input type="number" id="max-budget" required placeholder="مثال: 8000 دج" class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none font-bold text-emerald-600">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="date_label">تاريخ التنفيذ</label>
-                            <input type="date" id="dep-date" required class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="time_label">التوقيت</label>
-                            <input type="time" id="dep-time" required class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="item_desc_label">تفاصيل السلعة أو الخدمة</label>
-                        <textarea id="item-desc" rows="3" placeholder="تفاصيل البضاعة، الوزن، أو مساحة الأرض..." class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none" required></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600" data-i18n="from_label">من (الانطلاق / الأرض)</label>
-                            <input type="text" id="pickup-loc" required placeholder="المدينة / الولاية" class="w-full border rounded-xl p-2.5 bg-gray-50 text-xs outline-none mt-1">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-600" data-i18n="to_label">إلى (الوجهة)</label>
-                            <input type="text" id="drop-loc" required placeholder="المدينة / الولاية الوجهة" class="w-full border rounded-xl p-2.5 bg-gray-50 text-xs outline-none mt-1">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm" data-i18n="post_order_btn">نشر الطلب وبدء المزايدة التنافسية ⚡</button>
-                </form>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-emerald-600"></i>
-                    <span data-i18n="my_orders_title">طلباتي ومتابعة عروض المزايدة</span>
-                </h3>
-                <div id="client-orders-list" class="space-y-3"></div>
-            </div>
-        </section>
-
-        <!-- 2. DZ TO EU VIEW -->
-        <section id="view-dz-to-eu" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 rounded-2xl shadow-md space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-amber-400 text-slate-900 p-3 rounded-xl text-xl font-black"><i class="fa-solid fa-box-open"></i></div>
-                    <div>
-                        <h2 class="text-lg font-bold" data-i18n="d2e_title">بوابة المغتربين: طلب سلع ومنتجات أصيلة من الجزائر إلى أوروبا 🇩🇿 ➔ 🇪🇺</h2>
-                        <p class="text-xs text-emerald-200" data-i18n="d2e_desc">طلب تمور، زيت، أو مواد محلية من الجزائر ليجلبها لك مسافر أو ناقل موثوق.</p>
-                    </div>
-                </div>
-
-                <form id="dz-to-eu-form" onsubmit="postDzToEuOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                    <input type="text" id="d2e-name" required placeholder="اسم المغترب ورقم التواصل (WhatsApp)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <input type="text" id="d2e-dest" required placeholder="البلد والمدينة الأوروبية الوجهة (مثال: فرنسا، باريس)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <input type="text" id="d2e-item" required placeholder="السلعة المطلوبة بدقة (مثال: 5 لتر زيت زيتون + 2 كغ تمور)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <input type="text" id="d2e-reward" required placeholder="المكافأة أو السعر المقترح للتوصيل (بالدورو € أو دج)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <button type="submit" class="md:col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl text-xs transition shadow-md" data-i18n="d2e_btn">نشر طلب المغترب في المنصة 🚀</button>
-                </form>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-list text-emerald-600"></i>
-                    <span data-i18n="d2e_list_title">طلبات المغتربين الحالية (متاحة للتنفيذ من طرف المسافرين)</span>
-                </h3>
-                <div id="dz-to-eu-list" class="space-y-3"></div>
-            </div>
-        </section>
-
-        <!-- 3. EUROPE TO DZ VIEW -->
-        <section id="view-europe" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white p-6 rounded-2xl shadow-md space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-amber-400 text-slate-900 p-3 rounded-xl text-xl font-black"><i class="fa-solid fa-earth-europe"></i></div>
-                    <div>
-                        <h2 class="text-lg font-bold" data-i18n="e2d_title">بوابة استيراد ونقل السلع من أوروبا (Caba & المقاول الذاتي 🇪🇺)</h2>
-                        <p class="text-xs text-blue-200" data-i18n="e2d_desc">سجل بضاعتك القادمة من أوروبا أو اعرض مساحة شحن فارغة للمقاولين والتجار.</p>
-                    </div>
-                </div>
-
-                <form id="europe-form" onsubmit="postEuropeOffer(event)" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                    <input type="text" id="e-merchant" required placeholder="اسم المقاول الذاتي / التاجر أو الناقل" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <input type="text" id="e-route" required placeholder="الخط (مثال: من مارسيليا إلى الجزائر)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <input type="text" id="e-goods" required placeholder="نوع السلعة أو المساحة (مثال: قطع غيار، 50 كغ)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <input type="text" id="e-price" required placeholder="السعر المقترح (بالدج أو الأورو €)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <button type="submit" class="md:col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl text-xs transition shadow-md" data-i18n="e2d_btn">نشر عرض أوروبا / Caba 🚀</button>
-                </form>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-boxes-stacked text-blue-600"></i>
-                    <span data-i18n="e2d_list_title">عروض وطلبات الشحن الدولي (أوروبا ➔ الجزائر)</span>
-                </h3>
-                <div id="europe-list" class="space-y-3"></div>
-            </div>
-        </section>
-
-        <!-- 4. RETOUR + VIEW -->
-        <section id="view-retour" class="hidden space-y-6">
-            <div class="bg-amber-50 border border-amber-200 p-6 rounded-2xl shadow-sm space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-amber-500 text-white p-3 rounded-xl text-xl"><i class="fa-solid fa-rotate-left"></i></div>
-                    <div>
-                        <h2 class="text-lg font-bold text-amber-900" data-i18n="retour_title">خدمة Retour + (رحلات العودة الفارغة)</h2>
-                        <p class="text-xs text-amber-700" data-i18n="retour_desc">سائق عائد بشاحنة فارغة؟ أضف مسار عودتك واحصل على شحنة.</p>
-                    </div>
-                </div>
-                <form id="retour-form" onsubmit="postRetour(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-                    <input type="text" id="r-driver" required placeholder="اسم السائق ورقم الهاتف" class="border rounded-xl p-2.5 bg-white text-xs outline-none">
-                    <input type="text" id="r-route" required placeholder="مسار العودة (مثال: من وهران إلى مستغانم)" class="border rounded-xl p-2.5 bg-white text-xs outline-none">
-                    <input type="text" id="r-vehicle" required placeholder="نوع الشاحنة (كاميوني / Benne / صهريج)" class="border rounded-xl p-2.5 bg-white text-xs outline-none">
-                    <button type="submit" class="md:col-span-3 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm" data-i18n="retour_btn">نشر رحلة العودة في Retour + 🔄</button>
-                </form>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-truck-ramp-box text-amber-500"></i>
-                    <span data-i18n="retour_list_title">شاحنات فارغة متاحة للعودة</span>
-                </h3>
-                <div id="retour-list" class="space-y-3"></div>
-            </div>
-        </section>
-
-        <!-- 5. DRIVER & AUCTION MARKET -->
-        <section id="view-driver" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-store text-amber-500"></i>
-                    <span data-i18n="auction_title">السوق المفتوح - نظام المزايدة التنافسية (Enchères)</span>
-                </h3>
-                <div id="market-orders-list" class="space-y-4"></div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 text-center py-4 text-xs border-t border-slate-800">
-        سريعة RAPIDE Platform &copy; 2026 - جميع الحقوق محفوظة
-    </footer>
-
-    <!-- Script Logic -->
-    <script>
-        const translations = {
-            ar: {
-                app_title: "سريعة (RAPIDE)", clear_all: "مسح الكل", no_notifs: "لا توجد إشعارات جديدة حالياً 🔕",
-                tab_local: "طلب محلي وفلاحي", tab_dztceu: "من الجزائر لأوروبا 🇩🇿➔🇪🇺", tab_eutodz: "من أوروبا للجزائر 🇪🇺➔🇩🇿", tab_auction: "المزايدة",
-                local_form_title: "نشر طلب نقل محلي أو خدمة فلاحية (مع نظام المزايدة 📉)", vehicle_label: "نوع المركبة أو الآلة الفلاحية",
-                budget_label: "الميزانية القصوى المقترحة (دج)", date_label: "تاريخ التنفيذ", time_label: "التوقيت",
-                item_desc_label: "تفاصيل السلعة أو الخدمة", from_label: "من (الانطلاق / الأرض)", to_label: "إلى (الوجهة)",
-                post_order_btn: "نشر الطلب وبدء المزايدة التنافسية ⚡", my_orders_title: "طلباتي ومتابعة عروض المزايدة",
-                d2e_title: "بوابة المغتربين: طلب سلع ومنتجات أصيلة من الجزائر إلى أوروبا 🇩🇿 ➔ 🇪🇺",
-                d2e_desc: "طلب تمور، زيت، أو مواد محلية من الجزائر ليجلبها لك مسافر أو ناقل موثوق.",
-                d2e_btn: "نشر طلب المغترب في المنصة 🚀", d2e_list_title: "طلبات المغتربين الحالية (متاحة للتنفيذ من طرف المسافرين)",
-                e2d_title: "بوابة استيراد ونقل السلع من أوروبا (Caba & المقاول الذاتي 🇪🇺)",
-                e2d_desc: "سجل بضاعتك القادمة من أوروبا أو اعرض مساحة شحن فارغة للمقاولين والتجار.",
-                e2d_btn: "نشر عرض أوروبا / Caba 🚀", e2d_list_title: "عروض وطلبات الشحن الدولي (أوروبا ➔ الجزائر)",
-                retour_title: "خدمة Retour + (رحلات العودة الفارغة)", retour_desc: "سائق عائد بشاحنة فارغة؟ أضف مسار عودتك واحصل على شحنة.",
-                retour_btn: "نشر رحلة العودة في Retour + 🔄", retour_list_title: "شاحنات فارغة متاحة للعودة",
-                auction_title: "السوق المفتوح - نظام المزايدة التنافسية (Enchères)",
-                accept_offer: "قبول العرض", currency: "دج"
-            },
-            fr: {
-                app_title: "RAPIDE", clear_all: "Tout effacer", no_notifs: "Aucune nouvelle notification 🔕",
-                tab_local: "Demande Locale & Agri", tab_dztceu: "DZ ➔ EU 🇩🇿➔🇪🇺", tab_eutodz: "EU ➔ DZ 🇪🇺➔🇩🇿", tab_auction: "Enchères",
-                local_form_title: "Publier une demande de transport ou service agricole (Enchères 📉)", vehicle_type_label: "Véhicule ou machine agricole",
-                budget_label: "Budget max (DZD)", date_label: "Date d'exécution", time_label: "Heure",
-                item_desc_label: "Détails de la marchandise ou service", from_label: "De (Départ / Terrain)", to_label: "Vers (Destination)",
-                post_order_btn: "Publier et lancer les enchères ⚡", my_orders_title: "Mes demandes et offres d'enchères",
-                d2e_title: "Portail Diaspora: Demande de produits algériens vers l'Europe 🇩🇿 ➔ 🇪🇺",
-                d2e_desc: "Commandez des dattes, de l'huile, ou des produits locaux ramenés par un voyageur.",
-                d2e_btn: "Publier la demande diaspora 🚀", d2e_list_title: "Demandes actuelles de la diaspora",
-                e2d_title: "Importation & Marchandises d'Europe (Caba & Auto-entrepreneur 🇪🇺)",
-                e2d_desc: "Enregistrez vos marchandises d'Europe ou proposez un espace de chargement.",
-                e2d_btn: "Publier l'offre Europe / Caba 🚀", e2d_list_title: "Offres de transport international",
-                retour_title: "Service Retour + (Trajets à vide)", retour_desc: "Chauffeur rentrant à vide ? Ajoutez votre trajet.",
-                retour_btn: "Publier le trajet Retour + 🔄", retour_list_title: "Camions vides disponibles",
-                auction_title: "Marché ouvert - Système d'enchères compétitives",
-                accept_offer: "Accepter l'offre", currency: "DZD"
-            },
-            en: {
-                app_title: "RAPIDE", clear_all: "Clear All", no_notifs: "No new notifications 🔕",
-                tab_local: "Local & Agri Request", tab_dztceu: "DZ to EU 🇩🇿➔🇪🇺", tab_eutodz: "EU to DZ 🇪🇺➔🇩🇿", tab_auction: "Auctions",
-                local_form_title: "Post Local Transport or Agri Service Request (Bidding 📉)", vehicle_label: "Vehicle or Agri Machine",
-                budget_label: "Max Budget (DZD)", date_label: "Execution Date", time_label: "Time",
-                item_desc_label: "Cargo or Service Details", from_label: "From (Pickup / Land)", to_label: "To (Destination)",
-                post_order_btn: "Post & Start Competitive Bidding ⚡", my_orders_title: "My Requests & Bidding Offers",
-                d2e_title: "Diaspora Portal: Authentic Goods from Algeria to Europe 🇩🇿 ➔ 🇪🇺",
-                d2e_desc: "Request local dates, oil, or goods to be brought by a trusted traveler.",
-                d2e_btn: "Post Diaspora Request 🚀", d2e_list_title: "Current Diaspora Requests",
-                e2d_title: "Import & Goods from Europe (Caba & Auto-Entrepreneur 🇪🇺)",
-                e2d_desc: "Register incoming European goods or offer cargo space.",
-                e2d_btn: "Post Europe / Caba Offer 🚀", e2d_list_title: "International Shipping Offers",
-                retour_title: "Retour+ (Empty Return Trips)", retour_desc: "Driver returning with empty truck? Add your route.",
-                retour_btn: "Publish Return Trip 🔄", retour_list_title: "Available Empty Trucks",
-                auction_title: "Open Market - Competitive Bidding (Enchères)",
-                accept_offer: "Accept Offer", currency: "DZD"
-            }
-        };
-
-        let currentLang = localStorage.getItem('rapide_lang') || 'ar';
-        let orders = JSON.parse(localStorage.getItem('rapide_orders')) || [];
-        let retourTrips = JSON.parse(localStorage.getItem('rapide_retour')) || [];
-        let europeOffers = JSON.parse(localStorage.getItem('rapide_europe')) || [];
-        let dzToEuOrders = JSON.parse(localStorage.getItem('rapide_dz_to_eu')) || [];
-        let notifications = JSON.parse(localStorage.getItem('rapide_notifications')) || [];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('lang-select').value = currentLang;
-            applyLanguage(currentLang);
-            renderAllViews();
-            renderNotifications();
-        });
-
-        function saveData() {
-            localStorage.setItem('rapide_orders', JSON.stringify(orders));
-            localStorage.setItem('rapide_retour', JSON.stringify(retourTrips));
-            localStorage.setItem('rapide_europe', JSON.stringify(europeOffers));
-            localStorage.setItem('rapide_dz_to_eu', JSON.stringify(dzToEuOrders));
-            localStorage.setItem('rapide_notifications', JSON.stringify(notifications));
-            localStorage.setItem('rapide_lang', currentLang);
-        }
-
-        function changeLanguage(lang) {
-            currentLang = lang;
-            applyLanguage(lang);
-            saveData();
-        }
-
-        function applyLanguage(lang) {
-            const htmlRoot = document.getElementById('html-root');
-            if (lang === 'ar') {
-                htmlRoot.setAttribute('dir', 'rtl');
-                htmlRoot.setAttribute('lang', 'ar');
-            } else {
-                htmlRoot.setAttribute('dir', 'ltr');
-                htmlRoot.setAttribute('lang', lang);
-            }
-
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang] && translations[lang][key]) {
-                    el.innerText = translations[lang][key];
-                }
-            });
-        }
-
-        // Notification Helper Functions
-        function addNotification(message, icon = 'fa-bell') {
-            const notif = {
-                id: Date.now(),
-                message: message,
-                icon: icon,
-                time: new Date().toLocaleTimeString(currentLang === 'ar' ? 'ar-DZ' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
-                read: false
-            };
-            notifications.unshift(notif);
-            saveData();
-            showToast(message);
-            renderNotifications();
-        }
-
-        function toggleNotifications() {
-            const panel = document.getElementById('notif-panel');
-            panel.classList.toggle('hidden');
-            notifications.forEach(n => n.read = true);
-            saveData();
-            renderNotifications();
-        }
-
-        function clearNotifications() {
-            notifications = [];
-            saveData();
-            renderNotifications();
-        }
-
-        function renderNotifications() {
-            const list = document.getElementById('notif-list');
-            const badge = document.getElementById('notif-badge');
-            const unreadCount = notifications.filter(n => !n.read).length;
-
-            if (unreadCount > 0) {
-                badge.innerText = unreadCount;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-
-            if (notifications.length === 0) {
-                list.innerHTML = `<p class="text-center py-6 text-gray-400">${translations[currentLang].no_notifs}</p>`;
-                return;
-            }
-
-            list.innerHTML = notifications.map(n => `
-                <div class="p-3 hover:bg-gray-50 flex items-start space-x-2.5 space-x-reverse transition ${!n.read ? 'bg-emerald-50/50' : ''}">
-                    <div class="p-2 bg-emerald-100 text-emerald-700 rounded-xl text-xs">
-                        <i class="fa-solid ${n.icon}"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-bold text-gray-800 text-[11px] leading-tight">${n.message}</p>
-                        <span class="text-[9px] text-gray-400 mt-1 block">${n.time}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-message');
-            msgEl.innerText = msg;
-            toast.classList.remove('-translate-y-28', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('-translate-y-28', 'opacity-0');
-            }, 3500);
-        }
-
-        function switchTab(tab) {
-            ['client', 'dz-to-eu', 'europe', 'retour', 'driver'].forEach(t => {
-                const view = document.getElementById(`view-${t}`);
-                const btn = document.getElementById(`tab-${t}`);
-                if (t === tab) {
-                    view.classList.remove('hidden');
-                    btn.className = "py-2.5 px-3 border-b-2 border-amber-300 text-white transition flex items-center gap-1.5";
-                } else {
-                    view.classList.add('hidden');
-                    btn.className = "py-2.5 px-3 border-b-2 border-transparent text-emerald-200 hover:text-white transition flex items-center gap-1.5";
-                }
-            });
-            renderAllViews();
-        }
-
-        function createOrder(e) {
-            e.preventDefault();
-            const desc = document.getElementById('item-desc').value;
-            const newOrder = {
-                id: Date.now(),
-                vehicle: document.getElementById('vehicle-type').value,
-                maxBudget: parseFloat(document.getElementById('max-budget').value),
-                depDate: document.getElementById('dep-date').value,
-                depTime: document.getElementById('dep-time').value,
-                desc: desc,
-                pickup: document.getElementById('pickup-loc').value,
-                drop: document.getElementById('drop-loc').value,
-                status: 'في المزايدة النشطة 📉',
-                offers: [],
-                assignedDriver: null,
-                finalPrice: 0
-            };
-            orders.unshift(newOrder);
-            saveData();
-            document.getElementById('order-form').reset();
-            
-            addNotification(`تم نشر طلبك: (${desc.substring(0, 20)}...) وبدأت المزايدة!`, 'fa-gavel');
-            renderAllViews();
-        }
-
-        function postDzToEuOrder(e) {
-            e.preventDefault();
-            const itemDesc = document.getElementById('d2e-item').value;
-            const item = {
-                id: Date.now(),
-                name: document.getElementById('d2e-name').value,
-                dest: document.getElementById('d2e-dest').value,
-                item: itemDesc,
-                reward: document.getElementById('d2e-reward').value
-            };
-            dzToEuOrders.unshift(item);
-            saveData();
-            document.getElementById('dz-to-eu-form').reset();
-            
-            addNotification(`طلب جديد من مغترب نحو أوروبا: ${itemDesc.substring(0, 20)}...`, 'fa-plane-departure');
-            renderAllViews();
-        }
-
-        function postEuropeOffer(e) {
-            e.preventDefault();
-            const goods = document.getElementById('e-goods').value;
-            const offer = {
-                id: Date.now(),
-                merchant: document.getElementById('e-merchant').value,
-                route: document.getElementById('e-route').value,
-                goods: goods,
-                price: document.getElementById('e-price').value
-            };
-            europeOffers.unshift(offer);
-            saveData();
-            document.getElementById('europe-form').reset();
-            
-            addNotification(`عرض شحن جديد من أوروبا: ${goods.substring(0, 20)}...`, 'fa-earth-europe');
-            renderAllViews();
-        }
-
-        function postRetour(e) {
-            e.preventDefault();
-            const route = document.getElementById('r-route').value;
-            const trip = {
-                id: Date.now(),
-                driver: document.getElementById('r-driver').value,
-                route: route,
-                vehicle: document.getElementById('r-vehicle').value
-            };
-            retourTrips.unshift(trip);
-            saveData();
-            document.getElementById('retour-form').reset();
-            
-            addNotification(`رحلة عودة فارغة جديدة (Retour +): ${route}`, 'fa-rotate-left');
-            renderAllViews();
-        }
-
-        function submitOffer(orderId) {
-            const priceInput = document.getElementById(`offer-price-${orderId}`).value;
-            if (!priceInput) return;
-            const order = orders.find(o => o.id === orderId);
-            if (order) {
-                const price = parseFloat(priceInput);
-                if (price > order.maxBudget) {
-                    alert('سعر المزايدة يجب ألا يتجاوز ميزانية الزبون القصوى!');
-                    return;
-                }
-                order.offers.push({ driverName: 'سائق معتمد', price: price });
-                order.offers.sort((a, b) => a.price - b.price);
-                saveData();
-                
-                addNotification(`تم تقديم عرض سعر جديد في المزايدة بقيمة ${price} دج!`, 'fa-circle-dollar-to-slot');
-                renderAllViews();
-            }
-        }
-
-        function acceptOffer(orderId, offerIndex) {
-            const order = orders.find(o => o.id === orderId);
-            if (order) {
-                const selectedOffer = order.offers[offerIndex];
-                order.assignedDriver = selectedOffer.driverName;
-                order.finalPrice = selectedOffer.price;
-                order.status = 'مؤكد بالمزايدة التنافسية ✅';
-                saveData();
-                
-                addNotification(`تهانينا! تم إرسال الموافقة وتأكيد الاتفاق بقيمة ${selectedOffer.price} دج`, 'fa-circle-check');
-                renderAllViews();
-            }
-        }
-
-        function renderAllViews() {
-            // Local orders
-            const clientList = document.getElementById('client-orders-list');
-            clientList.innerHTML = '';
-            if (orders.length === 0) {
-                clientList.innerHTML = `<p class="text-xs text-gray-400 py-4 text-center">لا توجد طلبات نشطة حالياً.</p>`;
-            } else {
-                orders.forEach(o => {
-                    let offersHtml = '';
-                    if (o.offers.length > 0) {
-                        offersHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">
-                            <h5 class="text-xs font-bold text-emerald-800">عروض المزايدة:</h5>
-                            ${o.offers.map((off, idx) => `
-                                <div class="flex justify-between items-center text-xs bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
-                                    <span>${off.driverName} - <strong class="text-emerald-700 text-sm">${off.price} دج</strong></span>
-                                    <button onclick="acceptOffer(${o.id}, ${idx})" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow-sm">${translations[currentLang].accept_offer}</button>
-                                </div>
-                            `).join('')}
-                        </div>`;
-                    }
-                    clientList.innerHTML += `
-                        <div class="border rounded-xl p-4 bg-gray-50/50 space-y-2">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded">${o.vehicle}</span>
-                                    <h4 class="font-bold text-gray-800 mt-1 text-sm">${o.desc}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">من: <strong>${o.pickup}</strong> ➡ إلى: <strong>${o.drop}</strong></p>
-                                </div>
-                                <span class="text-xs font-bold px-2.5 py-1 rounded bg-amber-100 text-amber-800">${o.status}</span>
-                            </div>
-                            ${offersHtml}
-                        </div>
-                    `;
-                });
-            }
-
-            // DZ to EU list
-            const d2eList = document.getElementById('dz-to-eu-list');
-            d2eList.innerHTML = '';
-            if (dzToEuOrders.length === 0) {
-                d2eList.innerHTML = `<p class="text-xs text-gray-400 py-4 text-center">لا توجد طلبات مغتربين حالياً.</p>`;
-            } else {
-                dzToEuOrders.forEach(item => {
-                    d2eList.innerHTML += `
-                        <div class="border border-emerald-200 bg-emerald-50/30 p-4 rounded-xl flex justify-between items-center text-xs">
-                            <div>
-                                <span class="font-bold text-emerald-900 text-sm"><i class="fa-solid fa-earth-americas ml-1"></i> الوجهة: ${item.dest}</span>
-                                <p class="text-gray-700 mt-1">السلعة المطلوبة: <strong>${item.item}</strong> | المغترب: <strong>${item.name}</strong></p>
-                            </div>
-                            <span class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl font-bold">المكافأة: ${item.reward}</span>
-                        </div>
-                    `;
-                });
-            }
-
-            // Europe offers
-            const euroList = document.getElementById('europe-list');
-            euroList.innerHTML = '';
-            europeOffers.forEach(e => {
-                euroList.innerHTML += `
-                    <div class="border border-blue-200 bg-blue-50/30 p-4 rounded-xl flex justify-between items-center text-xs">
-                        <div>
-                            <span class="font-bold text-blue-900 text-sm"><i class="fa-solid fa-plane ml-1"></i> ${e.route}</span>
-                            <p class="text-gray-600 mt-1">التاجر: <strong>${e.merchant}</strong> | السلعة: <strong>${e.goods}</strong></p>
-                        </div>
-                        <span class="bg-blue-600 text-white px-3 py-1.5 rounded-xl font-bold">${e.price}</span>
-                    </div>
-                `;
-            });
-
-            // Retour +
-            const retourList = document.getElementById('retour-list');
-            retourList.innerHTML = '';
-            retourTrips.forEach(r => {
-                retourList.innerHTML += `
-                    <div class="border border-amber-200 bg-amber-50/30 p-4 rounded-xl flex justify-between items-center text-xs">
-                        <div>
-                            <span class="font-bold text-amber-900 text-sm"><i class="fa-solid fa-route ml-1"></i> ${r.route}</span>
-                            <p class="text-gray-600 mt-1">السائق: <strong>${r.driver}</strong></p>
-                        </div>
-                        <span class="bg-amber-500 text-white px-3 py-1.5 rounded-xl font-bold">رحلة عودة 🔄</span>
-                    </div>
-                `;
-            });
-
-            // Market orders for auction
-            const marketList = document.getElementById('market-orders-list');
-            marketList.innerHTML = '';
-            const pendingOrders = orders.filter(o => o.status.includes('المزايدة'));
-            pendingOrders.forEach(o => {
-                marketList.innerHTML += `
-                    <div class="border rounded-xl p-4 bg-white space-y-3 shadow-sm">
-                        <h4 class="font-bold text-gray-800 text-sm">${o.desc}</h4>
-                        <div class="flex gap-2 pt-2 border-t border-gray-100">
-                            <input type="number" id="offer-price-${o.id}" placeholder="سعر أقل (دج)" class="border rounded-lg p-2 text-xs flex-1 outline-none bg-gray-50">
-                            <button onclick="submitOffer(${o.id})" class="bg-amber-500 text-slate-900 font-bold px-4 py-2 rounded-lg text-xs hover:bg-amber-600 transition">شارك بالمزايدة 📉</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-    </script>
+  container.innerHTML = drivers.map(driver => `
+    <div class="flex justify-between items-center p-3 border rounded-xl bg-gray-50 text-xs">
+      <div>
+        <h4 class="font-bold text-gray-800">${driver.name} - ${driver.phone}</h4>
+        <p class="text-gray-500">${driver.vehicle} | ${driver.plate}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-bold px-2 py-1 rounded ${driver.status.includes('مفعل') ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${driver.status}</span>
+        ${!driver.status.includes('مفعل') ? `<button onclick="approveDriver(${driver.id})" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-bold">تفعيل</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+</script>
 </body>
 </html>
