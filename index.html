@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سريعة (RAPIDE) - المنصة المتكاملة للنقل، الفلاحة، و Retour +</title>
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
@@ -29,7 +29,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center max-w-5xl">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-truck-fast text-2xl text-amber-300"></i>
-                <h1 class="text-xl font-bold">سريعة (RAPIDE) <span class="text-xs bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full font-extrabold">DZ ➔ EU 🌍</span></h1>
+                <h1 class="text-xl font-bold" data-i18n="app_title">سريعة (RAPIDE) <span class="text-xs bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full font-extrabold">DZ ➔ EU 🌍</span></h1>
             </div>
             
             <div class="flex items-center gap-3">
@@ -41,23 +41,23 @@
                     </button>
 
                     <!-- Notifications Dropdown Panel -->
-                    <div id="notif-panel" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 text-gray-800 overflow-hidden animate-fade-in">
+                    <div id="notif-panel" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 text-gray-800 overflow-hidden">
                         <div class="p-3.5 bg-slate-900 text-white flex justify-between items-center">
                             <span class="font-bold text-xs flex items-center gap-1.5"><i class="fa-solid fa-bell text-amber-400"></i> مركز الإشعارات الفورية</span>
-                            <button onclick="clearNotifications()" class="text-[10px] text-gray-400 hover:text-rose-400 font-semibold">مسح الكل</button>
+                            <button onclick="clearNotifications()" class="text-[10px] text-gray-400 hover:text-rose-400 font-semibold" data-i18n="clear_all">مسح الكل</button>
                         </div>
                         <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-100 text-xs">
-                            <p class="text-center py-6 text-gray-400">لا توجد إشعارات جديدة حالياً 🔕</p>
+                            <p class="text-center py-6 text-gray-400" data-i18n="no_notifs">لا توجد إشعارات جديدة حالياً 🔕</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Language Selector -->
-                <div class="flex items-center gap-1 bg-emerald-700 p-1 rounded-xl text-xs font-bold">
-                    <button onclick="setLang('ar')" id="lang-ar" class="px-2.5 py-1 rounded-lg transition bg-white text-emerald-800 shadow-sm">عربي</button>
-                    <button onclick="setLang('fr')" id="lang-fr" class="px-2.5 py-1 rounded-lg transition text-emerald-100 hover:text-white">FR</button>
-                    <button onclick="setLang('en')" id="lang-en" class="px-2.5 py-1 rounded-lg transition text-emerald-100 hover:text-white">EN</button>
-                </div>
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-emerald-700 text-white rounded-xl px-2 py-1.5 outline-none text-xs font-bold border border-emerald-500">
+                    <option value="ar">العربية (AR)</option>
+                    <option value="fr">Français (FR)</option>
+                    <option value="en">English (EN)</option>
+                </select>
             </div>
         </div>
 
@@ -65,19 +65,19 @@
         <div class="bg-emerald-700 border-t border-emerald-500/40 overflow-x-auto">
             <div class="container mx-auto px-4 flex justify-around max-w-5xl text-xs sm:text-sm font-bold whitespace-nowrap">
                 <button onclick="switchTab('client')" id="tab-client" class="py-2.5 px-3 border-b-2 border-amber-300 text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-box"></i> <span>طلب محلي وفلاحي</span>
+                    <i class="fa-solid fa-box"></i> <span data-i18n="tab_local">طلب محلي وفلاحي</span>
                 </button>
                 <button onclick="switchTab('dz-to-eu')" id="tab-dz-to-eu" class="py-2.5 px-3 border-b-2 border-transparent text-amber-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-plane-arrival"></i> <span>من الجزائر إلى أوروبا 🇩🇿➔🇪🇺</span>
+                    <i class="fa-solid fa-plane-arrival"></i> <span data-i18n="tab_dztceu">من الجزائر لأوروبا 🇩🇿➔🇪🇺</span>
                 </button>
                 <button onclick="switchTab('europe')" id="tab-europe" class="py-2.5 px-3 border-b-2 border-transparent text-amber-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-earth-europe"></i> <span>من أوروبا للجزائر 🇪🇺➔🇩🇿</span>
+                    <i class="fa-solid fa-earth-europe"></i> <span data-i18n="tab_eutodz">من أوروبا للجزائر 🇪🇺➔🇩🇿</span>
                 </button>
                 <button onclick="switchTab('retour')" id="tab-retour" class="py-2.5 px-3 border-b-2 border-transparent text-amber-200 hover:text-white transition flex items-center gap-1.5">
                     <i class="fa-solid fa-rotate-left"></i> <span>Retour + 🔄</span>
                 </button>
                 <button onclick="switchTab('driver')" id="tab-driver" class="py-2.5 px-3 border-b-2 border-transparent text-emerald-200 hover:text-white transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-gavel"></i> <span>المزايدة</span>
+                    <i class="fa-solid fa-gavel"></i> <span data-i18n="tab_auction">المزايدة</span>
                 </button>
             </div>
         </div>
@@ -91,13 +91,13 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
                     <i class="fa-solid fa-gavel text-emerald-600"></i>
-                    <span>نشر طلب نقل محلي أو خدمة فلاحية (مع نظام المزايدة 📉)</span>
+                    <span data-i18n="local_form_title">نشر طلب نقل محلي أو خدمة فلاحية (مع نظام المزايدة 📉)</span>
                 </h2>
 
                 <form id="order-form" onsubmit="createOrder(event)" class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">نوع المركبة أو الآلة الفلاحية</label>
+                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="vehicle_label">نوع المركبة أو الآلة الفلاحية</label>
                             <select id="vehicle-type" class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none">
                                 <option value="شاحنة خفيفة (كاميوني)">شاحنة خفيفة (كاميوني للبضائع)</option>
                                 <option value="شاحنة نقل رمال وحصى (Benne)">شاحنة نقل رمال وحصى (Benne)</option>
@@ -107,41 +107,41 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">الميزانية القصوى المقترحة (دج)</label>
+                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="budget_label">الميزانية القصوى المقترحة (دج)</label>
                             <input type="number" id="max-budget" required placeholder="مثال: 8000 دج" class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none font-bold text-emerald-600">
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">تاريخ التنفيذ</label>
+                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="date_label">تاريخ التنفيذ</label>
                             <input type="date" id="dep-date" required class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-600 mb-1">التوقيت</label>
+                            <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="time_label">التوقيت</label>
                             <input type="time" id="dep-time" required class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none">
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 mb-1">تفاصيل السلعة أو الخدمة</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1" data-i18n="item_desc_label">تفاصيل السلعة أو الخدمة</label>
                         <textarea id="item-desc" rows="3" placeholder="تفاصيل البضاعة، الوزن، أو مساحة الأرض..." class="w-full border rounded-xl p-3 bg-gray-50 text-sm outline-none" required></textarea>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-gray-600">من (الانطلاق / الأرض)</label>
+                            <label class="block text-xs font-bold text-gray-600" data-i18n="from_label">من (الانطلاق / الأرض)</label>
                             <input type="text" id="pickup-loc" required placeholder="المدينة / الولاية" class="w-full border rounded-xl p-2.5 bg-gray-50 text-xs outline-none mt-1">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-600">إلى (الوجهة)</label>
+                            <label class="block text-xs font-bold text-gray-600" data-i18n="to_label">إلى (الوجهة)</label>
                             <input type="text" id="drop-loc" required placeholder="المدينة / الولاية الوجهة" class="w-full border rounded-xl p-2.5 bg-gray-50 text-xs outline-none mt-1">
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm">نشر الطلب وبدء المزايدة التنافسية ⚡</button>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg text-sm" data-i18n="post_order_btn">نشر الطلب وبدء المزايدة التنافسية ⚡</button>
                 </form>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-emerald-600"></i>
-                    <span>طلباتي ومتابعة عروض المزايدة</span>
+                    <span data-i18n="my_orders_title">طلباتي ومتابعة عروض المزايدة</span>
                 </h3>
                 <div id="client-orders-list" class="space-y-3"></div>
             </div>
@@ -153,8 +153,8 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-amber-400 text-slate-900 p-3 rounded-xl text-xl font-black"><i class="fa-solid fa-box-open"></i></div>
                     <div>
-                        <h2 class="text-lg font-bold">بوابة المغتربين: طلب سلع ومنتجات أصيلة من الجزائر إلى أوروبا 🇩🇿 ➔ 🇪🇺</h2>
-                        <p class="text-xs text-emerald-200">طلب تمور، زيت، أو مواد محلية من الجزائر ليجلبها لك مسافر أو ناقل موثوق.</p>
+                        <h2 class="text-lg font-bold" data-i18n="d2e_title">بوابة المغتربين: طلب سلع ومنتجات أصيلة من الجزائر إلى أوروبا 🇩🇿 ➔ 🇪🇺</h2>
+                        <p class="text-xs text-emerald-200" data-i18n="d2e_desc">طلب تمور، زيت، أو مواد محلية من الجزائر ليجلبها لك مسافر أو ناقل موثوق.</p>
                     </div>
                 </div>
 
@@ -163,13 +163,13 @@
                     <input type="text" id="d2e-dest" required placeholder="البلد والمدينة الأوروبية الوجهة (مثال: فرنسا، باريس)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
                     <input type="text" id="d2e-item" required placeholder="السلعة المطلوبة بدقة (مثال: 5 لتر زيت زيتون + 2 كغ تمور)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
                     <input type="text" id="d2e-reward" required placeholder="المكافأة أو السعر المقترح للتوصيل (بالدورو € أو دج)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <button type="submit" class="md:col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl text-xs transition shadow-md">نشر طلب المغترب في المنصة 🚀</button>
+                    <button type="submit" class="md:col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl text-xs transition shadow-md" data-i18n="d2e_btn">نشر طلب المغترب في المنصة 🚀</button>
                 </form>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-list text-emerald-600"></i>
-                    <span>طلبات المغتربين الحالية (متاحة للتنفيذ من طرف المسافرين)</span>
+                    <span data-i18n="d2e_list_title">طلبات المغتربين الحالية (متاحة للتنفيذ من طرف المسافرين)</span>
                 </h3>
                 <div id="dz-to-eu-list" class="space-y-3"></div>
             </div>
@@ -181,8 +181,8 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-amber-400 text-slate-900 p-3 rounded-xl text-xl font-black"><i class="fa-solid fa-earth-europe"></i></div>
                     <div>
-                        <h2 class="text-lg font-bold">بوابة استيراد ونقل السلع من أوروبا (Caba & المقاول الذاتي 🇪🇺)</h2>
-                        <p class="text-xs text-blue-200">سجل بضاعتك القادمة من أوروبا أو اعرض مساحة شحن فارغة للمقاولين والتجار.</p>
+                        <h2 class="text-lg font-bold" data-i18n="e2d_title">بوابة استيراد ونقل السلع من أوروبا (Caba & المقاول الذاتي 🇪🇺)</h2>
+                        <p class="text-xs text-blue-200" data-i18n="e2d_desc">سجل بضاعتك القادمة من أوروبا أو اعرض مساحة شحن فارغة للمقاولين والتجار.</p>
                     </div>
                 </div>
 
@@ -191,13 +191,13 @@
                     <input type="text" id="e-route" required placeholder="الخط (مثال: من مارسيليا إلى الجزائر)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
                     <input type="text" id="e-goods" required placeholder="نوع السلعة أو المساحة (مثال: قطع غيار، 50 كغ)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
                     <input type="text" id="e-price" required placeholder="السعر المقترح (بالدج أو الأورو €)" class="border rounded-xl p-2.5 bg-white text-slate-900 text-xs outline-none">
-                    <button type="submit" class="md:col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl text-xs transition shadow-md">نشر عرض أوروبا / Caba 🚀</button>
+                    <button type="submit" class="md:col-span-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-xl text-xs transition shadow-md" data-i18n="e2d_btn">نشر عرض أوروبا / Caba 🚀</button>
                 </form>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-boxes-stacked text-blue-600"></i>
-                    <span>عروض وطلبات الشحن الدولي (أوروبا ➔ الجزائر)</span>
+                    <span data-i18n="e2d_list_title">عروض وطلبات الشحن الدولي (أوروبا ➔ الجزائر)</span>
                 </h3>
                 <div id="europe-list" class="space-y-3"></div>
             </div>
@@ -209,21 +209,21 @@
                 <div class="flex items-center gap-3">
                     <div class="bg-amber-500 text-white p-3 rounded-xl text-xl"><i class="fa-solid fa-rotate-left"></i></div>
                     <div>
-                        <h2 class="text-lg font-bold text-amber-900">خدمة Retour + (رحلات العودة الفارغة)</h2>
-                        <p class="text-xs text-amber-700">سائق عائد بشاحنة فارغة؟ أضف مسار عودتك واحصل على شحنة.</p>
+                        <h2 class="text-lg font-bold text-amber-900" data-i18n="retour_title">خدمة Retour + (رحلات العودة الفارغة)</h2>
+                        <p class="text-xs text-amber-700" data-i18n="retour_desc">سائق عائد بشاحنة فارغة؟ أضف مسار عودتك واحصل على شحنة.</p>
                     </div>
                 </div>
                 <form id="retour-form" onsubmit="postRetour(event)" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
                     <input type="text" id="r-driver" required placeholder="اسم السائق ورقم الهاتف" class="border rounded-xl p-2.5 bg-white text-xs outline-none">
                     <input type="text" id="r-route" required placeholder="مسار العودة (مثال: من وهران إلى مستغانم)" class="border rounded-xl p-2.5 bg-white text-xs outline-none">
                     <input type="text" id="r-vehicle" required placeholder="نوع الشاحنة (كاميوني / Benne / صهريج)" class="border rounded-xl p-2.5 bg-white text-xs outline-none">
-                    <button type="submit" class="md:col-span-3 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">نشر رحلة العودة في Retour + 🔄</button>
+                    <button type="submit" class="md:col-span-3 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm" data-i18n="retour_btn">نشر رحلة العودة في Retour + 🔄</button>
                 </form>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-truck-ramp-box text-amber-500"></i>
-                    <span>شاحنات فارغة متاحة للعودة</span>
+                    <span data-i18n="retour_list_title">شاحنات فارغة متاحة للعودة</span>
                 </h3>
                 <div id="retour-list" class="space-y-3"></div>
             </div>
@@ -234,7 +234,7 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h3 class="font-bold text-gray-800 text-md border-b pb-3 flex items-center gap-2">
                     <i class="fa-solid fa-store text-amber-500"></i>
-                    <span>السوق المفتوح - نظام المزايدة التنافسية (Enchères)</span>
+                    <span data-i18n="auction_title">السوق المفتوح - نظام المزايدة التنافسية (Enchères)</span>
                 </h3>
                 <div id="market-orders-list" class="space-y-4"></div>
             </div>
@@ -249,6 +249,64 @@
 
     <!-- Script Logic -->
     <script>
+        const translations = {
+            ar: {
+                app_title: "سريعة (RAPIDE)", clear_all: "مسح الكل", no_notifs: "لا توجد إشعارات جديدة حالياً 🔕",
+                tab_local: "طلب محلي وفلاحي", tab_dztceu: "من الجزائر لأوروبا 🇩🇿➔🇪🇺", tab_eutodz: "من أوروبا للجزائر 🇪🇺➔🇩🇿", tab_auction: "المزايدة",
+                local_form_title: "نشر طلب نقل محلي أو خدمة فلاحية (مع نظام المزايدة 📉)", vehicle_label: "نوع المركبة أو الآلة الفلاحية",
+                budget_label: "الميزانية القصوى المقترحة (دج)", date_label: "تاريخ التنفيذ", time_label: "التوقيت",
+                item_desc_label: "تفاصيل السلعة أو الخدمة", from_label: "من (الانطلاق / الأرض)", to_label: "إلى (الوجهة)",
+                post_order_btn: "نشر الطلب وبدء المزايدة التنافسية ⚡", my_orders_title: "طلباتي ومتابعة عروض المزايدة",
+                d2e_title: "بوابة المغتربين: طلب سلع ومنتجات أصيلة من الجزائر إلى أوروبا 🇩🇿 ➔ 🇪🇺",
+                d2e_desc: "طلب تمور، زيت، أو مواد محلية من الجزائر ليجلبها لك مسافر أو ناقل موثوق.",
+                d2e_btn: "نشر طلب المغترب في المنصة 🚀", d2e_list_title: "طلبات المغتربين الحالية (متاحة للتنفيذ من طرف المسافرين)",
+                e2d_title: "بوابة استيراد ونقل السلع من أوروبا (Caba & المقاول الذاتي 🇪🇺)",
+                e2d_desc: "سجل بضاعتك القادمة من أوروبا أو اعرض مساحة شحن فارغة للمقاولين والتجار.",
+                e2d_btn: "نشر عرض أوروبا / Caba 🚀", e2d_list_title: "عروض وطلبات الشحن الدولي (أوروبا ➔ الجزائر)",
+                retour_title: "خدمة Retour + (رحلات العودة الفارغة)", retour_desc: "سائق عائد بشاحنة فارغة؟ أضف مسار عودتك واحصل على شحنة.",
+                retour_btn: "نشر رحلة العودة في Retour + 🔄", retour_list_title: "شاحنات فارغة متاحة للعودة",
+                auction_title: "السوق المفتوح - نظام المزايدة التنافسية (Enchères)",
+                accept_offer: "قبول العرض", currency: "دج"
+            },
+            fr: {
+                app_title: "RAPIDE", clear_all: "Tout effacer", no_notifs: "Aucune nouvelle notification 🔕",
+                tab_local: "Demande Locale & Agri", tab_dztceu: "DZ ➔ EU 🇩🇿➔🇪🇺", tab_eutodz: "EU ➔ DZ 🇪🇺➔🇩🇿", tab_auction: "Enchères",
+                local_form_title: "Publier une demande de transport ou service agricole (Enchères 📉)", vehicle_type_label: "Véhicule ou machine agricole",
+                budget_label: "Budget max (DZD)", date_label: "Date d'exécution", time_label: "Heure",
+                item_desc_label: "Détails de la marchandise ou service", from_label: "De (Départ / Terrain)", to_label: "Vers (Destination)",
+                post_order_btn: "Publier et lancer les enchères ⚡", my_orders_title: "Mes demandes et offres d'enchères",
+                d2e_title: "Portail Diaspora: Demande de produits algériens vers l'Europe 🇩🇿 ➔ 🇪🇺",
+                d2e_desc: "Commandez des dattes, de l'huile, ou des produits locaux ramenés par un voyageur.",
+                d2e_btn: "Publier la demande diaspora 🚀", d2e_list_title: "Demandes actuelles de la diaspora",
+                e2d_title: "Importation & Marchandises d'Europe (Caba & Auto-entrepreneur 🇪🇺)",
+                e2d_desc: "Enregistrez vos marchandises d'Europe ou proposez un espace de chargement.",
+                e2d_btn: "Publier l'offre Europe / Caba 🚀", e2d_list_title: "Offres de transport international",
+                retour_title: "Service Retour + (Trajets à vide)", retour_desc: "Chauffeur rentrant à vide ? Ajoutez votre trajet.",
+                retour_btn: "Publier le trajet Retour + 🔄", retour_list_title: "Camions vides disponibles",
+                auction_title: "Marché ouvert - Système d'enchères compétitives",
+                accept_offer: "Accepter l'offre", currency: "DZD"
+            },
+            en: {
+                app_title: "RAPIDE", clear_all: "Clear All", no_notifs: "No new notifications 🔕",
+                tab_local: "Local & Agri Request", tab_dztceu: "DZ to EU 🇩🇿➔🇪🇺", tab_eutodz: "EU to DZ 🇪🇺➔🇩🇿", tab_auction: "Auctions",
+                local_form_title: "Post Local Transport or Agri Service Request (Bidding 📉)", vehicle_label: "Vehicle or Agri Machine",
+                budget_label: "Max Budget (DZD)", date_label: "Execution Date", time_label: "Time",
+                item_desc_label: "Cargo or Service Details", from_label: "From (Pickup / Land)", to_label: "To (Destination)",
+                post_order_btn: "Post & Start Competitive Bidding ⚡", my_orders_title: "My Requests & Bidding Offers",
+                d2e_title: "Diaspora Portal: Authentic Goods from Algeria to Europe 🇩🇿 ➔ 🇪🇺",
+                d2e_desc: "Request local dates, oil, or goods to be brought by a trusted traveler.",
+                d2e_btn: "Post Diaspora Request 🚀", d2e_list_title: "Current Diaspora Requests",
+                e2d_title: "Import & Goods from Europe (Caba & Auto-Entrepreneur 🇪🇺)",
+                e2d_desc: "Register incoming European goods or offer cargo space.",
+                e2d_btn: "Post Europe / Caba Offer 🚀", e2d_list_title: "International Shipping Offers",
+                retour_title: "Retour+ (Empty Return Trips)", retour_desc: "Driver returning with empty truck? Add your route.",
+                retour_btn: "Publish Return Trip 🔄", retour_list_title: "Available Empty Trucks",
+                auction_title: "Open Market - Competitive Bidding (Enchères)",
+                accept_offer: "Accept Offer", currency: "DZD"
+            }
+        };
+
+        let currentLang = localStorage.getItem('rapide_lang') || 'ar';
         let orders = JSON.parse(localStorage.getItem('rapide_orders')) || [];
         let retourTrips = JSON.parse(localStorage.getItem('rapide_retour')) || [];
         let europeOffers = JSON.parse(localStorage.getItem('rapide_europe')) || [];
@@ -256,6 +314,8 @@
         let notifications = JSON.parse(localStorage.getItem('rapide_notifications')) || [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('lang-select').value = currentLang;
+            applyLanguage(currentLang);
             renderAllViews();
             renderNotifications();
         });
@@ -266,6 +326,31 @@
             localStorage.setItem('rapide_europe', JSON.stringify(europeOffers));
             localStorage.setItem('rapide_dz_to_eu', JSON.stringify(dzToEuOrders));
             localStorage.setItem('rapide_notifications', JSON.stringify(notifications));
+            localStorage.setItem('rapide_lang', currentLang);
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            applyLanguage(lang);
+            saveData();
+        }
+
+        function applyLanguage(lang) {
+            const htmlRoot = document.getElementById('html-root');
+            if (lang === 'ar') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                htmlRoot.setAttribute('lang', 'ar');
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                htmlRoot.setAttribute('lang', lang);
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
         }
 
         // Notification Helper Functions
@@ -274,7 +359,7 @@
                 id: Date.now(),
                 message: message,
                 icon: icon,
-                time: new Date().toLocaleTimeString('ar-DZ', { hour: '2-digit', minute: '2-digit' }),
+                time: new Date().toLocaleTimeString(currentLang === 'ar' ? 'ar-DZ' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
                 read: false
             };
             notifications.unshift(notif);
@@ -286,7 +371,6 @@
         function toggleNotifications() {
             const panel = document.getElementById('notif-panel');
             panel.classList.toggle('hidden');
-            // Mark all as read when opening
             notifications.forEach(n => n.read = true);
             saveData();
             renderNotifications();
@@ -311,7 +395,7 @@
             }
 
             if (notifications.length === 0) {
-                list.innerHTML = `<p class="text-center py-6 text-gray-400">لا توجد إشعارات جديدة حالياً 🔕</p>`;
+                list.innerHTML = `<p class="text-center py-6 text-gray-400">${translations[currentLang].no_notifs}</p>`;
                 return;
             }
 
@@ -479,7 +563,7 @@
                             ${o.offers.map((off, idx) => `
                                 <div class="flex justify-between items-center text-xs bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
                                     <span>${off.driverName} - <strong class="text-emerald-700 text-sm">${off.price} دج</strong></span>
-                                    <button onclick="acceptOffer(${o.id}, ${idx})" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow-sm">قبول العرض</button>
+                                    <button onclick="acceptOffer(${o.id}, ${idx})" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow-sm">${translations[currentLang].accept_offer}</button>
                                 </div>
                             `).join('')}
                         </div>`;
