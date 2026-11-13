@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="r">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سريعة RAPIDE</title>
+<meta name="theme-color" content="#059669">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{font-family:Cairo,system-ui,sans-serif;background:#f9fafb;color:#1f2937}
+.i{width:100%;border:1px solid #e5e7eb;border-radius:.75rem;padding:.6rem;background:#f9fafb;font-size:.85rem;outline:none}
+.b{width:100%;background:#059669;color:#fff;font-weight:700;padding:.75rem;border-radius:.75rem}
+.b2{background:#059669;color:#fff;font-weight:700;padding:.3rem .75rem;border-radius:.5rem;font-size:.75rem}
+.c{background:#fff;border:1px solid #f3f4f6;border-radius:1rem;padding:1rem;box-shadow:0 1px 2px #0001}
+.f{display:block;font-size:.75rem;font-weight:700;margin-bottom:.25rem;color:#4b5563}
+</style>
+</head>
+<body>
+<div id="auth" class="hidden fixed inset-0 z-50 bg-gray-50 overflow-y-auto"><div class="max-w-sm mx-auto mt-10 p-5 space-y-3 c"><h2 class="font-bold text-emerald-700 text-lg">🚚 RAPIDE</h2><input id="a-name" class="i"><input id="a-phone" type="tel" class="i"><input id="a-mail" type="email" class="i"><input id="a-pass" type="password" class="i"><p id="a-err" class="text-xs text-red-600"></p><button class="b" id="a-in" onclick="doAuth('login')"></button><button class="b" id="a-up" style="background:#2563eb" onclick="doAuth('signup')"></button></div></div>
+<div id="toast" class="fixed top-3 inset-x-3 z-50 mx-auto max-w-sm bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl opacity-0 pointer-events-none transition-opacity"></div>
+<header class="bg-emerald-600 text-white sticky top-0 z-40 shadow">
+ <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-2 relative">
+  <div><h1 class="font-bold text-lg">🚚 <span data-i="title"></span></h1><div id="cs" class="text-[11px] opacity-90"></div></div>
+  <div class="flex items-center gap-2">
+   <button onclick="togN()" class="relative bg-emerald-700 rounded-xl px-3 py-1.5">🔔<span id="badge" class="hidden absolute -top-1 -end-1 bg-rose-500 text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span></button>
+   <button id="out" onclick="logout()" class="hidden bg-emerald-700 rounded-xl px-3 py-1.5 text-xs font-bold">⎋</button><select id="lang" onchange="setLang(this.value)" class="bg-emerald-700 rounded-xl px-2 py-1.5 text-xs font-bold"><option value="ar">AR</option><option value="fr">FR</option><option value="en">EN</option></select>
+  </div>
+  <div id="np" class="hidden absolute end-4 top-14 w-72 bg-white text-gray-800 rounded-2xl shadow-2xl overflow-hidden z-50">
+   <div class="p-3 bg-slate-900 text-white flex justify-between text-xs font-bold"><span>🔔 <span data-i="notif"></span></span><button onclick="notes=[];save();render()" data-i="clr"></button></div>
+   <div id="nl" class="max-h-72 overflow-y-auto divide-y text-xs"></div>
+  </div>
+ </div>
+ <nav id="nav" class="bg-emerald-700 overflow-x-auto whitespace-nowrap text-xs font-bold"><div class="max-w-4xl mx-auto px-2 flex" id="tabs"></div></nav>
+</header>
+<main class="max-w-4xl mx-auto px-4 py-5 space-y-5">
+ <div id="inst" class="hidden c flex justify-between items-center"><span class="text-sm font-bold" data-i="install"></span><button class="b2" id="instb" data-i="instb"></button></div>
+
+ <section id="v-order" class="space-y-5">
+  <form id="fo" class="c space-y-3" onsubmit="addOrder(event)">
+   <h2 class="font-bold text-emerald-700" data-i="f_order"></h2>
+   <div class="grid md:grid-cols-2 gap-3">
+    <div><label class="f" data-i="veh"></label><select id="veh" class="i"></select></div>
+    <div><label class="f" data-i="conf"></label><select id="conf" class="i"><option value="otp" data-i="o_otp"></option><option value="photo" data-i="o_photo"></option><option value="click" data-i="o_click"></option><option value="qr" data-i="o_qr"></option></select></div>
+    <div><label class="f" data-i="date"></label><input type="date" id="date" class="i" required></div>
+    <div><label class="f" data-i="time"></label><input type="time" id="time" class="i" required></div>
+   </div>
+   <div class="grid md:grid-cols-2 gap-3">
+    <div class="bg-emerald-50 rounded-xl p-3 space-y-2"><b class="f" data-i="from"></b><div id="loc-from" class="space-y-2"></div></div>
+    <div class="bg-emerald-50 rounded-xl p-3 space-y-2"><b class="f" data-i="to"></b><div id="loc-to" class="space-y-2"></div></div>
+   </div>
+   <div><label class="f" data-i="desc"></label><textarea id="desc" rows="3" class="i" required data-p="desc"></textarea></div>
+   <div><label class="f" data-i="budget"></label><input type="number" id="budget" min="1" class="i font-bold text-emerald-700" required></div>
+   <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 space-y-2">
+    <label class="flex gap-2 items-center text-sm font-bold"><input type="checkbox" id="wk" onchange="$('wb').classList.toggle('hidden',!this.checked)"><span data-i="wk"></span></label>
+    <div id="wb" class="hidden grid grid-cols-2 gap-2"><input type="number" id="wn" min="1" value="1" class="i" data-p="wn"><input type="number" id="wp" min="0" class="i" data-p="wp"></div>
+   </div>
+   <label class="flex gap-2 items-center text-sm font-bold bg-blue-50 border border-blue-100 rounded-xl p-3"><input type="checkbox" id="live"><span data-i="live"></span></label>
+   <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-3 space-y-2">
+    <label class="flex gap-2 items-center text-sm font-bold"><input type="checkbox" id="inv" onchange="$('ib').classList.toggle('hidden',!this.checked)"><span data-i="inv"></span></label>
+    <div id="ib" class="hidden grid md:grid-cols-2 gap-2"><input type="number" id="ia" min="0" class="i" data-p="ia"><input type="file" id="ifile" accept="image/*" class="i"></div>
+   </div>
+   <button class="b" data-i="post"></button>
+  </form>
+  <div class="c space-y-3"><h3 class="font-bold" data-i="mine"></h3><div id="l-client" class="space-y-3"></div></div>
+ </section>
+
+ <section id="v-eu" class="hidden space-y-5">
+  <form id="fe" class="c space-y-3" onsubmit="addEu(event)">
+   <h2 class="font-bold text-blue-800" data-i="eu_t"></h2>
+   <select id="e-dir" class="i"><option value="d2e" data-i="dir1"></option><option value="e2d" data-i="dir2"></option></select>
+   <input id="e-who" class="i" required data-p="who">
+   <input id="e-route" class="i" required data-p="route">
+   <input id="e-goods" class="i" required data-p="goods">
+   <input id="e-price" class="i" required data-p="eprice">
+   <button class="b" data-i="eu_btn"></button>
+  </form>
+  <div class="c space-y-3"><div id="l-eu" class="space-y-3"></div></div>
+ </section>
+
+ <section id="v-ret" class="hidden space-y-5">
+  <form id="frt" class="c space-y-3" onsubmit="addRet(event)">
+   <h2 class="font-bold text-amber-700">🔄 <span data-i="ret_t"></span></h2>
+   <p class="text-xs text-amber-700" data-i="ret_d"></p>
+   <input id="r-who" class="i" required data-p="who">
+   <input id="r-route" class="i" required data-p="route">
+   <select id="r-veh" class="i"></select>
+   <button class="b" style="background:#d97706" data-i="ret_btn"></button>
+  </form>
+  <div class="c space-y-3"><div id="l-ret" class="space-y-3"></div></div>
+ </section>
+
+ <section id="v-mkt" class="hidden"><div class="c space-y-3"><h2 class="font-bold" data-i="mkt_t"></h2><div id="l-mkt" class="space-y-3"></div></div></section>
+
+ <section id="v-drv" class="hidden"><form id="fd" class="c space-y-3" onsubmit="addDrv(event)">
+  <h2 class="font-bold text-emerald-700" data-i="join"></h2>
+  <input id="d-name" class="i" required data-p="name"><input id="d-phone" type="tel" class="i" required data-p="phone">
+  <select id="d-veh" class="i"></select><input id="d-plate" class="i" required data-p="plate">
+  <button class="b" data-i="send"></button>
+ </form></section>
+
+ <section id="v-adm" class="hidden space-y-5">
+  <div class="c bg-emerald-50 space-y-3">
+   <h2 class="font-bold text-emerald-800" data-i="adm"></h2>
+   <select id="week" onchange="week=+this.value;push('cfg',{id:1,week});save();render()" class="i"><option value="1" data-i="w1"></option><option value="2" data-i="w2"></option><option value="3" data-i="w3"></option></select>
+   <div class="text-xs text-gray-500"><span data-i="rev"></span> <b id="rev" class="text-2xl text-emerald-600 block"></b></div>
+  </div>
+  <div class="c space-y-3"><h3 class="font-bold text-red-600" data-i="review"></h3><div id="l-adm" class="space-y-2"></div></div>
+ </section>
+</main>
+
+<script src="config.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const L=(k,d)=>{try{const v=JSON.parse(localStorage.getItem('rapide_'+k));return v??d}catch(e){return d}};
+const S=(k,v)=>{try{localStorage.setItem('rapide_'+k,JSON.stringify(v))}catch(e){}};
+const T={
+ar:{title:'سريعة RAPIDE',notif:'الإشعارات',clr:'مسح الكل',nn:'لا إشعارات 🔕',t_order:'📦 طلب نقل / فلاحة',t_eu:'🌍 الجزائر ⇄ أوروبا',t_ret:'🔄 Retour +',t_mkt:'🏷️ المزايدة',t_drv:'🚛 سائق جديد',t_adm:'📊 الإدارة',
+f_order:'أضف طلبك (سلع، معدات، خدمة فلاحية)',veh:'المركبة أو الآلة',conf:'طريقة تأكيد التسليم',o_otp:'كود سري (OTP)',o_photo:'صورة إثبات',o_click:'تأكيد بضغطة زر',o_qr:'رمز QR',date:'تاريخ الانطلاق',time:'التوقيت',from:'من',to:'إلى',desc:'تفاصيل السلعة أو الخدمة (الوزن، المساحة...)',budget:'الميزانية القصوى (دج)',
+wk:'👷 طلب عمال للشحن والتفريغ',wn:'عدد العمال',wp:'سعر العامل (دج)',live:'📡 تفعيل التتبع الحي (يُشارك عبر WhatsApp)',inv:'🧾 رحلة مرفقة بفاتورة',ia:'قيمة الفاتورة (دج)',post:'نشر الطلب وبدء المزايدة ⚡',mine:'طلباتي',none:'لا توجد بيانات.',
+offers:'عروض المزايدة',accept:'قبول',assigned:'السائق',agreed:'السعر',otp:'الكود',st_open:'في المزايدة',st_active:'قيد التنفيذ',st_done:'مكتمل ✅',cur:'دج',wil:'الولاية...',com:'البلدية...',gps:'📍 موقعي GPS',
+eu_t:'الجزائر ⇄ أوروبا (المغتربون، Caba، المقاول الذاتي)',dir1:'🇩🇿➔🇪🇺 طلب سلعة من الجزائر إلى أوروبا',dir2:'🇪🇺➔🇩🇿 عرض شحن من أوروبا إلى الجزائر',who:'الاسم ورقم الهاتف / WhatsApp',route:'الخط أو الوجهة (مثال: مارسيليا ➔ الجزائر)',goods:'السلعة أو المساحة',eprice:'السعر أو المكافأة (€ أو دج)',eu_btn:'نشر 🚀',
+ret_t:'Retour + (رحلات العودة الفارغة)',ret_d:'سائق عائد بشاحنة فارغة؟ أضف مسارك واحصل على شحنة.',ret_btn:'نشر رحلة العودة',mkt_t:'السوق المفتوح - المزايدة التنافسية',bid:'سعر أقل (دج)',bidb:'شارك 📉',fin:'تأكيد التسليم',nodrv:'لا يوجد سائق مفعّل',
+join:'انضم كسائق أو صاحب معدة',name:'الاسم الكامل',phone:'الهاتف',plate:'رقم اللوحة (01234-116-16)',send:'إرسال طلب الانضمام',adm:'الإدارة وأرباح المنصة',w1:'الأسبوع 1 (مجاني)',w2:'الأسبوع 2 (مجاني)',w3:'الأسبوع 3+ (عمولة 5%)',rev:'أرباح المنصة:',review:'مراجعة السائقين',ok:'مفعّل ✅',wait:'قيد المراجعة ⏳',actv:'تفعيل',
+install:'ثبّت التطبيق على هاتفك',instb:'تثبيت',n_order:'طلب جديد بدأت مزايدته',n_offer:'عرض جديد بقيمة',n_acc:'تم تأكيد الاتفاق بقيمة',n_eu:'منشور جديد (الجزائر ⇄ أوروبا)',n_ret:'رحلة عودة فارغة جديدة',n_drv:'طلب انضمام سائق جديد',over:'السعر يتجاوز الميزانية القصوى!',bad:'الكود غير صحيح',ask:'أدخل كود التسليم:',gpsok:'تم تحديد الموقع',gpsno:'تعذر تحديد الموقع',sync:'تعذّرت المزامنة مع الخادم',
+v:{moto:'دراجة نارية',taxi:'سيارة تاكسي',van:'شاحنة خفيفة',truck:'شاحنة كبيرة',semi:'مقطورة كبرى',fork:'رافعة شوكية',dig:'حفارة / آلة أشغال',benne:'شاحنة رمال وحصى (Benne)',cist:'صهريج ماء وسوائل',trac:'جرار فلاحي',frig:'شاحنة مبردة'}},
+fr:{title:'RAPIDE',notif:'Notifications',clr:'Tout effacer',nn:'Aucune notification 🔕',t_order:'📦 Demande transport / agri',t_eu:'🌍 DZ ⇄ Europe',t_ret:'🔄 Retour +',t_mkt:'🏷️ Enchères',t_drv:'🚛 Devenir chauffeur',t_adm:'📊 Admin',
+f_order:'Publier une demande (marchandises, engins, service agricole)',veh:'Véhicule ou machine',conf:'Confirmation de livraison',o_otp:'Code secret (OTP)',o_photo:'Photo de preuve',o_click:'Confirmation 1 clic',o_qr:'QR Code',date:'Date de départ',time:'Heure',from:'De',to:'Vers',desc:'Détails (poids, surface...)',budget:'Budget max (DZD)',
+wk:'👷 Manutentionnaires requis',wn:'Nombre d’ouvriers',wp:'Prix par ouvrier (DZD)',live:'📡 Suivi GPS en direct (via WhatsApp)',inv:'🧾 Transport avec facture',ia:'Montant de la facture (DZD)',post:'Publier et lancer les enchères ⚡',mine:'Mes demandes',none:'Aucune donnée.',
+offers:'Offres',accept:'Accepter',assigned:'Chauffeur',agreed:'Prix',otp:'Code',st_open:'En enchères',st_active:'En cours',st_done:'Terminé ✅',cur:'DZD',wil:'Wilaya...',com:'Commune...',gps:'📍 Ma position GPS',
+eu_t:'DZ ⇄ Europe (diaspora, Caba, auto-entrepreneur)',dir1:'🇩🇿➔🇪🇺 Produit d’Algérie vers l’Europe',dir2:'🇪🇺➔🇩🇿 Offre de transport Europe vers Algérie',who:'Nom et téléphone / WhatsApp',route:'Trajet (ex : Marseille ➔ Alger)',goods:'Marchandise ou espace',eprice:'Prix ou récompense (€ ou DZD)',eu_btn:'Publier 🚀',
+ret_t:'Retour + (trajets à vide)',ret_d:'Chauffeur rentrant à vide ? Ajoutez votre trajet.',ret_btn:'Publier le trajet',mkt_t:'Marché ouvert - Enchères',bid:'Prix plus bas (DZD)',bidb:'Enchérir 📉',fin:'Confirmer la livraison',nodrv:'Aucun chauffeur activé',
+join:'Devenir chauffeur ou propriétaire d’engin',name:'Nom complet',phone:'Téléphone',plate:'Matricule (01234-116-16)',send:'Envoyer la demande',adm:'Admin et revenus',w1:'Semaine 1 (gratuit)',w2:'Semaine 2 (gratuit)',w3:'Semaine 3+ (commission 5%)',rev:'Revenus :',review:'Validation des chauffeurs',ok:'Activé ✅',wait:'En attente ⏳',actv:'Activer',
+install:'Installer l’application',instb:'Installer',n_order:'Nouvelle demande, enchères ouvertes',n_offer:'Nouvelle offre de',n_acc:'Accord confirmé pour',n_eu:'Nouvelle annonce (DZ ⇄ Europe)',n_ret:'Nouveau trajet de retour à vide',n_drv:'Nouvelle demande de chauffeur',over:'Le prix dépasse le budget max !',bad:'Code incorrect',ask:'Entrez le code de livraison :',gpsok:'Position enregistrée',gpsno:'Position indisponible',sync:'Synchronisation impossible',
+v:{moto:'Moto',taxi:'Taxi',van:'Camionnette',truck:'Poids lourd',semi:'Semi-remorque',fork:'Chariot élévateur',dig:'Pelle mécanique',benne:'Benne (sable, gravier)',cist:'Citerne (eau, liquides)',trac:'Tracteur agricole',frig:'Camion frigorifique'}},
+en:{title:'RAPIDE',notif:'Notifications',clr:'Clear all',nn:'No notifications 🔕',t_order:'📦 Transport / agri request',t_eu:'🌍 DZ ⇄ Europe',t_ret:'🔄 Retour +',t_mkt:'🏷️ Auctions',t_drv:'🚛 Join as driver',t_adm:'📊 Admin',
+f_order:'Post a request (cargo, equipment, agri service)',veh:'Vehicle or machine',conf:'Delivery confirmation',o_otp:'OTP code',o_photo:'Photo proof',o_click:'1-click confirm',o_qr:'QR code',date:'Departure date',time:'Time',from:'From',to:'To',desc:'Details (weight, area...)',budget:'Max budget (DZD)',
+wk:'👷 Request loaders/unloaders',wn:'Number of workers',wp:'Price per worker (DZD)',live:'📡 Live GPS tracking (shared via WhatsApp)',inv:'🧾 Trip with invoice',ia:'Invoice amount (DZD)',post:'Post and start bidding ⚡',mine:'My requests',none:'No data.',
+offers:'Bids',accept:'Accept',assigned:'Driver',agreed:'Price',otp:'Code',st_open:'Bidding',st_active:'In progress',st_done:'Completed ✅',cur:'DZD',wil:'Wilaya...',com:'Commune...',gps:'📍 My GPS location',
+eu_t:'DZ ⇄ Europe (diaspora, Caba, self-employed)',dir1:'🇩🇿➔🇪🇺 Goods from Algeria to Europe',dir2:'🇪🇺➔🇩🇿 Shipping offer Europe to Algeria',who:'Name and phone / WhatsApp',route:'Route (e.g. Marseille ➔ Algiers)',goods:'Goods or space',eprice:'Price or reward (€ or DZD)',eu_btn:'Post 🚀',
+ret_t:'Retour + (empty return trips)',ret_d:'Driving back empty? Add your route and get cargo.',ret_btn:'Post return trip',mkt_t:'Open market - Auctions',bid:'Lower price (DZD)',bidb:'Bid 📉',fin:'Confirm delivery',nodrv:'No active driver',
+join:'Join as driver or equipment owner',name:'Full name',phone:'Phone',plate:'Plate number (01234-116-16)',send:'Submit application',adm:'Admin and revenue',w1:'Week 1 (free)',w2:'Week 2 (free)',w3:'Week 3+ (5% fee)',rev:'Platform revenue:',review:'Driver review',ok:'Active ✅',wait:'Pending ⏳',actv:'Activate',
+install:'Install the app on your phone',instb:'Install',n_order:'New request, bidding open',n_offer:'New bid of',n_acc:'Deal confirmed at',n_eu:'New post (DZ ⇄ Europe)',n_ret:'New empty return trip',n_drv:'New driver application',over:'Price exceeds the max budget!',bad:'Wrong code',ask:'Enter delivery code:',gpsok:'Location saved',gpsno:'Location unavailable',sync:'Sync failed',
+v:{moto:'Motorcycle',taxi:'Taxi',van:'Light truck',truck:'Heavy truck',semi:'Semi-trailer',fork:'Forklift',dig:'Excavator',benne:'Dump truck (sand, gravel)',cist:'Tanker (water, liquids)',trac:'Farm tractor',frig:'Refrigerated truck'}}
+};
+let lang=L('lang','ar');
+const t=k=>T[lang][k]??T.ar[k]??k;
+const vl=id=>T[lang].v[id]||id;
+const W0=[{c:'01',n:'أدرار - Adrar',m:['أدرار','تيميمون','رقان']},{c:'02',n:'الشلف - Chlef',m:['الشلف','تنس','بوقادير']},{c:'16',n:'الجزائر - Algiers',m:['الجزائر الوسطى','باب الوادي','الرويبة','زرالدة']},{c:'17',n:'الجلفة - Djelfa',m:['الجلفة','مسعد','حاسي بحبح','عين وسارة']},{c:'27',n:'مستغانم - Mostaganem',m:['مستغانم','عين تادلس','حاسي ماماش','سيدي علي']},{c:'31',n:'وهران - Oran',m:['وهران','بئر الجير','السانية','ارزيو']}];
+const W=('أدرار - Adrar|الشلف - Chlef|الأغواط - Laghouat|أم البواقي - Oum El Bouaghi|باتنة - Batna|بجاية - Béjaïa|بسكرة - Biskra|بشار - Béchar|البليدة - Blida|البويرة - Bouira|تمنراست - Tamanrasset|تبسة - Tébessa|تلمسان - Tlemcen|تيارت - Tiaret|تيزي وزو - Tizi Ouzou|الجزائر - Algiers|الجلفة - Djelfa|جيجل - Jijel|سطيف - Sétif|سعيدة - Saïda|سكيكدة - Skikda|سيدي بلعباس - Sidi Bel Abbès|عنابة - Annaba|قالمة - Guelma|قسنطينة - Constantine|المدية - Médéa|مستغانم - Mostaganem|المسيلة - M\'Sila|معسكر - Mascara|ورقلة - Ouargla|وهران - Oran|البيض - El Bayadh|إليزي - Illizi|برج بوعريريج - Bordj Bou Arréridj|بومرداس - Boumerdès|الطارف - El Tarf|تندوف - Tindouf|تيسمسيلت - Tissemsilt|الوادي - El Oued|خنشلة - Khenchela|سوق أهراس - Souk Ahras|تيبازة - Tipaza|ميلة - Mila|عين الدفلى - Aïn Defla|النعامة - Naâma|عين تموشنت - Aïn Témouchent|غرداية - Ghardaïa|غليزان - Relizane|تيميمون - Timimoun|برج باجي مختار - Bordj Badji Mokhtar|أولاد جلال - Ouled Djellal|بني عباس - Béni Abbès|عين صالح - In Salah|عين قزام - In Guezzam|تقرت - Touggourt|جانت - Djanet|المغير - El M\'Ghair|المنيعة - El Meniaa').split('|').map((n,i)=>{const c=String(i+1).padStart(2,'0'),o=W0.find(w=>w.c===c);return{c,n,m:o?o.m:[n.split(' - ')[0]]}});
+let orders=L('orders',[]),drivers=L('drivers',[{id:1,name:'سليم بوحجر',phone:'0555123456',veh:'truck',plate:'01234-116-16',ok:true}]),eu=L('eu',[]),ret=L('ret',[]),notes=L('notes',[]),week=L('week',3),rev=L('rev',0),gps={},cur='order';
+const save=()=>{S('orders',orders);S('drivers',drivers);S('eu',eu);S('ret',ret);S('notes',notes);S('week',week);S('rev',rev);S('lang',lang)};
+const TABS=[['order','t_order'],['eu','t_eu'],['ret','t_ret'],['mkt','t_mkt'],['drv','t_drv'],['adm','t_adm']];
+function nav(){$('tabs').innerHTML=TABS.filter(([k])=>k!=='adm'||isAdm||!cloudOn).map(([k,l])=>`<button onclick="tab('${k}')" class="px-3 py-2.5 border-b-2 ${k===cur?'border-amber-300 text-white':'border-transparent text-emerald-200'}">${t(l)}</button>`).join('')}
+function tab(id){cur=id;TABS.forEach(([k])=>$('v-'+k).classList.toggle('hidden',k!==id));nav();render()}
+function toast(m){const e=$('toast');e.textContent=m;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,3000)}
+function note(m){notes.unshift({m,tm:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),read:false});save();toast(m);render()}
+function togN(){$('np').classList.toggle('hidden');notes.forEach(n=>n.read=true);save();render()}
+function setLang(l){lang=l;save();apply()}
+function apply(){
+ $('r').dir=lang==='ar'?'rtl':'ltr';$('r').lang=lang;$('lang').value=lang;
+ document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+ document.querySelectorAll('[data-p]').forEach(e=>e.placeholder=t(e.dataset.p));
+ ['veh','r-veh','d-veh'].forEach(id=>{const s=$(id),v=s.value;s.innerHTML=Object.keys(T.ar.v).map(k=>`<option value="${k}">${esc(vl(k))}</option>`).join('');if(v)s.value=v});
+ ['from','to'].forEach(p=>locUI(p));$('week').value=week;nav();setCS(csState);render();
+}
+function locUI(p){
+ const ws=$(p+'-w')?.value||'';
+ $('loc-'+p).innerHTML=`<div class="grid grid-cols-2 gap-2"><select id="${p}-w" class="i" onchange="comm('${p}')"><option value="">${t('wil')}</option>${W.map(w=>`<option value="${esc(w.n)}" ${w.n===ws?'selected':''}>${w.c} - ${esc(w.n)}</option>`).join('')}</select><select id="${p}-c" class="i"><option value="">${t('com')}</option></select></div><button type="button" class="b2 w-full" onclick="getGps('${p}')">${t('gps')}</button><small id="${p}-g" class="text-emerald-700">${gps[p]?'✔ '+gps[p]:''}</small>`;
+ if(ws)comm(p);
+}
+function comm(p){const w=W.find(x=>x.n===$(p+'-w').value);$(p+'-c').innerHTML=`<option value="">${t('com')}</option>`+(w?w.m.map(c=>`<option>${esc(c)}</option>`).join(''):'')}
+function getGps(p){
+ if(!navigator.geolocation)return toast(t('gpsno'));
+ navigator.geolocation.getCurrentPosition(pos=>{gps[p]=pos.coords.latitude.toFixed(5)+','+pos.coords.longitude.toFixed(5);$(p+'-g').textContent='✔ '+gps[p];toast(t('gpsok'))},()=>toast(t('gpsno')));
+}
+function addOrder(e){
+ e.preventDefault();
+ const place=p=>gps[p]?`GPS (${gps[p]})`:[$(p+'-w').value,$(p+'-c').value].filter(Boolean).join(' - ')||'—';
+ const n=$('wk').checked?(+$('wn').value||1):0,pr=$('wk').checked?(+$('wp').value||0):0;
+ const o={id:Date.now(),veh:$('veh').value,conf:$('conf').value,date:$('date').value,time:$('time').value,desc:$('desc').value,from:place('from'),to:place('to'),gf:gps.from||'',budget:+$('budget').value,
+  wk:n?{n,p:pr}:null,live:$('live').checked,inv:$('inv').checked?{a:+$('ia').value||0,f:$('ifile').files[0]?.name||''}:null,otp:Math.floor(1000+Math.random()*9000),st:'open',offers:[],drv:'',price:0,uid:uid()};
+ orders.unshift(o);push('orders',o);gps={};e.target.reset();$('wb').classList.add('hidden');$('ib').classList.add('hidden');$('date').value=$('date').min;
+ ['from','to'].forEach(locUI);note('🏷️ '+t('n_order'));
+}
+function bid(id){
+ const o=orders.find(x=>x.id===id),p=+$('op-'+id).value,d=$('od-'+id).value;
+ if(!o||!p||!d)return;
+ if(p>o.budget)return alert(t('over'));
+ const f={id:o.id+'_'+Date.now(),oid:o.id,d,p};o.offers.push({d,p});o.offers.sort((a,b)=>a.p-b.p);push('offers',f);note('💬 '+t('n_offer')+' '+p+' '+t('cur'));
+}
+function acc(id,i){
+ const o=orders.find(x=>x.id===id),f=o&&o.offers[i];if(!f)return;
+ o.drv=f.d;o.price=f.p;o.st='active';o.fee=week>=3?f.p*0.05:0;push('orders',o);note('✅ '+t('n_acc')+' '+f.p+' '+t('cur'));
+}
+function fin(id){
+ const o=orders.find(x=>x.id===id);if(!o)return;
+ if(o.conf==='otp'&&prompt(t('ask'))!=String(o.otp))return alert(t('bad'));
+ o.st='done';push('done',{id:'d'+o.id,oid:o.id});save();render();
+}
+function wa(id){
+ const o=orders.find(x=>x.id===id);if(!o)return;
+ const link=o.gf?`https://maps.google.com/?q=${o.gf}`:'';
+ window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(`🚚 RAPIDE\n${o.desc}\n${vl(o.veh)}\n${t('from')}: ${o.from}\n${t('to')}: ${o.to}\n${link}`),'_blank');
+}
+function addEu(e){e.preventDefault();const x={id:Date.now(),dir:$('e-dir').value,who:$('e-who').value,route:$('e-route').value,goods:$('e-goods').value,price:$('e-price').value};eu.unshift(x);push('eu',x);e.target.reset();note('🌍 '+t('n_eu'))}
+function addRet(e){e.preventDefault();const x={id:Date.now(),who:$('r-who').value,route:$('r-route').value,veh:$('r-veh').value};ret.unshift(x);push('ret',x);const r=$('r-route').value;e.target.reset();note('🔄 '+t('n_ret')+': '+r)}
+function addDrv(e){e.preventDefault();const x={id:Date.now(),name:$('d-name').value,phone:$('d-phone').value,veh:$('d-veh').value,plate:$('d-plate').value,ok:false,uid:uid()};drivers.push(x);push('drivers',x);e.target.reset();note('🚛 '+t('n_drv'))}
+function appr(id){const d=drivers.find(x=>x.id===id);if(d){d.ok=true;push('drivers',d);save();render()}}
+const stc={open:'bg-amber-100 text-amber-700',active:'bg-blue-100 text-blue-700',done:'bg-green-100 text-green-700'};
+const info=o=>`<span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded font-bold">${esc(vl(o.veh))}</span><h4 class="font-bold mt-2">${esc(o.desc)}</h4><p class="text-xs text-gray-500 mt-1">⏰ ${esc(o.date)} ${esc(o.time)} · ${t('from')}: <b>${esc(o.from)}</b> → ${t('to')}: <b>${esc(o.to)}</b></p><p class="text-xs mt-1">💰 <b>${o.budget} ${t('cur')}</b>${o.wk?` · 👷 ${o.wk.n}×${o.wk.p}=${o.wk.n*o.wk.p} ${t('cur')}`:''}${o.inv?` · 🧾 ${o.inv.a} ${t('cur')}`:''}</p>`;
+const badge=o=>`<span class="text-[11px] font-bold px-2 py-1 rounded h-fit ${stc[o.st]}">${t('st_'+o.st)}</span>`;
+const empty=()=>`<p class="text-center text-gray-400 text-sm py-3">${t('none')}</p>`;
+function render(){
+ const un=notes.filter(n=>!n.read).length;$('badge').textContent=un;$('badge').classList.toggle('hidden',!un);
+ $('nl').innerHTML=notes.length?notes.map(n=>`<div class="p-3 ${n.read?'':'bg-emerald-50'}"><p class="font-bold">${esc(n.m)}</p><span class="text-[10px] text-gray-400">${n.tm}</span></div>`).join(''):`<p class="text-center py-5 text-gray-400">${t('nn')}</p>`;
+ const my=orders.filter(o=>!o.uid||o.uid===uid());$('l-client').innerHTML=my.length?my.map(o=>`<div class="border rounded-xl p-3 bg-gray-50"><div class="flex justify-between gap-2"><div>${info(o)}</div>${badge(o)}</div>${o.live?`<button class="b2 mt-2" onclick="wa(${o.id})">📲 WhatsApp</button>`:''}${o.st==='open'?`<div class="mt-3 border-t pt-2 space-y-1"><b class="text-xs">${t('offers')} (${o.offers.length})</b>${o.offers.map((f,i)=>`<div class="flex justify-between items-center bg-white border rounded-lg p-2 text-xs"><span>${esc(f.d)}: <b>${f.p} ${t('cur')}</b></span><button class="b2" onclick="acc(${o.id},${i})">${t('accept')}</button></div>`).join('')}</div>`:`<div class="mt-3 border-t pt-2 text-xs text-emerald-800">${t('assigned')}: <b>${esc(o.drv)}</b> · ${t('agreed')}: <b>${o.price} ${t('cur')}</b>${o.conf==='otp'&&o.st==='active'?` · ${t('otp')}: <b class="font-mono text-sm">${o.otp}</b>`:''}</div>`}</div>`).join(''):empty();
+ $('l-eu').innerHTML=eu.length?eu.map(x=>`<div class="border rounded-xl p-3 text-xs ${x.dir==='d2e'?'bg-emerald-50 border-emerald-200':'bg-blue-50 border-blue-200'}"><b class="text-sm">${x.dir==='d2e'?'🇩🇿➔🇪🇺':'🇪🇺➔🇩🇿'} ${esc(x.route)}</b><p class="mt-1">${esc(x.goods)} · ${esc(x.who)}</p><span class="inline-block mt-1 font-bold bg-white rounded px-2 py-0.5">${esc(x.price)}</span></div>`).join(''):empty();
+ $('l-ret').innerHTML=ret.length?ret.map(x=>`<div class="border border-amber-200 bg-amber-50 rounded-xl p-3 text-xs"><b class="text-sm">🔄 ${esc(x.route)}</b><p class="mt-1">${esc(x.who)} · ${esc(vl(x.veh))}</p></div>`).join(''):empty();
+ const ok=drivers.filter(d=>d.ok&&(!d.uid||d.uid===uid())),mk=orders.filter(o=>o.st!=='done');
+ $('l-mkt').innerHTML=mk.length?mk.map(o=>`<div class="border rounded-xl p-3 bg-gray-50"><div class="flex justify-between gap-2"><div>${info(o)}</div>${badge(o)}</div>${o.st==='open'?(ok.length?`<div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t"><select id="od-${o.id}" class="i">${ok.map(d=>`<option>${esc(d.name)}</option>`).join('')}</select><input id="op-${o.id}" type="number" min="1" class="i" placeholder="${t('bid')}"><button class="b2 col-span-2 py-2" onclick="bid(${o.id})">${t('bidb')}</button></div>`:`<p class="text-xs text-red-500 mt-2">${t('nodrv')}</p>`):`${ok.some(d=>d.name===o.drv)?`<button class="b2 w-full mt-3" style="background:#2563eb" onclick="fin(${o.id})">${t('fin')}</button>`:''}`}</div>`).join(''):empty();
+ rev=orders.reduce((s,o)=>s+(o.fee||0),0);$('rev').textContent=rev.toLocaleString()+' '+t('cur');
+ $('l-adm').innerHTML=drivers.map(d=>`<div class="flex justify-between items-center border rounded-xl p-3 bg-gray-50 text-xs"><div><b>${esc(d.name)} - ${esc(d.phone)}</b><p class="text-gray-500">${esc(vl(d.veh))} | ${esc(d.plate)}</p></div><div class="flex items-center gap-2"><span class="font-bold px-2 py-1 rounded ${d.ok?'bg-green-100 text-green-700':'bg-amber-100 text-amber-700'}">${d.ok?t('ok'):t('wait')}</span>${d.ok?'':`<button class="b2" onclick="appr(${d.id})">${t('actv')}</button>`}</div></div>`).join('')||empty();
+ save();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const today=new Date().toISOString().slice(0,10);$('date').value=today;$('date').min=today;
+ apply();tab('order');
+ if(cloudOn){if(sess)start();else showAuth();setInterval(()=>{if(sess)pull()},10000)}
+ try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+});
+const C=window.RAPIDE_CLOUD||{},cloudOn=!!(C.url&&C.key);
+let sess=L('sess',null),me=sess&&sess.user,isAdm=false;
+const uid=()=>(me&&me.id)||'local';
+const AU=p=>C.url.replace(/\/$/,'')+'/auth/v1/'+p;
+async function gt(p,b){const r=await fetch(AU(p),{method:'POST',headers:{apikey:C.key,'Content-Type':'application/json'},body:JSON.stringify(b)});const j=await r.json();if(!r.ok)throw new Error(j.msg||j.error_description||j.message||'error');return j}
+function setSess(j){if(!j.access_token)return false;sess={access_token:j.access_token,refresh_token:j.refresh_token,exp:Date.now()/1000+(j.expires_in||3600),user:j.user||(sess&&sess.user)};S('sess',sess);me=sess.user;return true}
+async function hd(){
+ if(sess&&sess.exp-Date.now()/1000<60){try{setSess(await gt('token?grant_type=refresh_token',{refresh_token:sess.refresh_token}))}catch(e){logout()}}
+ const h={apikey:C.key,'Content-Type':'application/json'};if(sess)h.Authorization='Bearer '+sess.access_token;return h
+}
+const CA={ar:{login:'دخول',signup:'إنشاء حساب جديد',email:'البريد الإلكتروني',pass:'كلمة المرور (6 أحرف على الأقل)',name:'الاسم الكامل (للتسجيل)',phone:'الهاتف (للتسجيل)',confirm:'تم إنشاء الحساب. أكّد بريدك ثم ادخل.'},fr:{login:'Connexion',signup:'Créer un compte',email:'E-mail',pass:'Mot de passe (6 caractères min.)',name:'Nom complet (inscription)',phone:'Téléphone (inscription)',confirm:'Compte créé. Confirmez votre e-mail puis connectez-vous.'},en:{login:'Log in',signup:'Create account',email:'Email',pass:'Password (min. 6 characters)',name:'Full name (sign up)',phone:'Phone (sign up)',confirm:'Account created. Confirm your email, then log in.'}};
+function showAuth(){const c=CA[lang];$('a-name').placeholder=c.name;$('a-phone').placeholder=c.phone;$('a-mail').placeholder=c.email;$('a-pass').placeholder=c.pass;$('a-in').textContent=c.login;$('a-up').textContent=c.signup;$('auth').classList.remove('hidden')}
+async function doAuth(m){
+ const e=$('a-mail').value.trim(),p=$('a-pass').value;$('a-err').textContent='';
+ try{
+  const j=m==='login'?await gt('token?grant_type=password',{email:e,password:p}):await gt('signup',{email:e,password:p,data:{name:$('a-name').value,phone:$('a-phone').value}});
+  if(!setSess(j)){$('a-err').textContent=CA[lang].confirm;return}
+  $('auth').classList.add('hidden');start();
+ }catch(x){$('a-err').textContent=x.message}
+}
+function logout(){sess=null;me=null;isAdm=false;S('sess',null);$('out').classList.add('hidden');nav();showAuth()}
+async function chkAdm(){try{const r=await fetch(C.url.replace(/\/$/,'')+'/rest/v1/rapide_admins?select=user_id',{headers:await hd()});const j=await r.json();isAdm=Array.isArray(j)&&j.length>0}catch(e){isAdm=false}nav()}
+async function start(){me=sess.user;$('out').classList.remove('hidden');await chkAdm();lastSig='';pull()}
+const REST=()=>C.url.replace(/\/$/,'')+'/rest/v1/rapide_docs';
+const CS={ar:{local:'محلي فقط (بدون خادم)',on:'متصل بالخادم',err:'تعذّر الاتصال بالخادم',wait:'جارٍ الاتصال...'},fr:{local:'Local seulement (sans serveur)',on:'Connecté au serveur',err:'Serveur injoignable',wait:'Connexion...'},en:{local:'Local only (no server)',on:'Connected to server',err:'Server unreachable',wait:'Connecting...'}};
+let csState=cloudOn?'wait':'local';
+function setCS(s){csState=s;const e=$('cs');if(e)e.textContent=({local:'📱 ',on:'🟢 ',err:'🔴 ',wait:'⏳ '}[s])+CS[lang][s]}
+let lastSig='';
+async function push(kind,o){
+ if(!cloudOn)return;
+ try{
+  const r=await fetch(REST()+'?on_conflict=kind,id',{method:'POST',headers:{...await hd(),Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({kind,id:String(o.id),data:kind==='orders'?{...o,offers:undefined}:o,updated_at:new Date().toISOString()})});
+  if(!r.ok)throw 0;lastSig='';pull();
+ }catch(e){setCS('err');toast('⚠️ '+t('sync'))}
+}
+async function pull(){
+ if(!cloudOn)return;
+ try{
+  if(!sess)return;const r=await fetch(REST()+'?select=kind,data',{headers:await hd()});if(!r.ok)throw 0;setCS('on');
+  const rows=await r.json(),by=k=>rows.filter(x=>x.kind===k).map(x=>x.data),sig=JSON.stringify(rows);
+  if(sig===lastSig)return;lastSig=sig;
+  orders=by('orders').sort((a,b)=>b.id-a.id);eu=by('eu').sort((a,b)=>b.id-a.id);ret=by('ret').sort((a,b)=>b.id-a.id);
+  const offs=by('offers'),dn=new Set(by('done').map(x=>x.oid));
+  orders.forEach(o=>{o.offers=offs.filter(f=>f.oid===o.id).sort((a,b)=>a.p-b.p);if(dn.has(o.id))o.st='done'});
+  const dv=by('drivers').sort((a,b)=>a.id-b.id);drivers=dv;
+  const cfg=by('cfg')[0];if(cfg){week=cfg.week;$('week').value=week}
+  if(!$('l-mkt').contains(document.activeElement))render();
+ }catch(e){setCS('err')}
+}
+let dp;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('inst').classList.remove('hidden')});
+$('instb').onclick=async()=>{if(dp){dp.prompt();await dp.userChoice;dp=null;$('inst').classList.add('hidden')}};
+</script>
+<script src="verify.js"></script>
+</body>
+</html>
